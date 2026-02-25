@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivos Favoritos - FileManager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+        }
+
+        /* Contenedor principal */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Barra lateral */
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #4a6cf7;
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .logo span {
+            color: #4a6cf7;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px 0;
+            background: #f9fafc;
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 15px;
+            background: #eef1ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar i {
+            font-size: 36px;
+            color: #4a6cf7;
+        }
+
+        .user-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .user-details p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .btn-login {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #3a5ce5;
+        }
+
+        /* Menú */
+        .menu ul {
+            list-style: none;
+        }
+
+        .menu li {
+            margin-bottom: 5px;
+        }
+
+        .menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .menu li a:hover {
+            background: #f5f7ff;
+            color: #4a6cf7;
+        }
+
+        .menu li.active a {
+            background: #f5f7ff;
+            color: #4a6cf7;
+            font-weight: 500;
+        }
+
+        .menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Información de almacenamiento */
+        .storage-info {
+            background: #f9fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .storage-header h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .storage-header span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .storage-bar {
+            height: 6px;
+            background: #eef1ff;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .storage-progress {
+            height: 100%;
+            background: #4a6cf7;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .storage-text {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Pie de barra lateral */
+        .sidebar-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .sidebar-footer a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .sidebar-footer a:hover {
+            color: #4a6cf7;
+        }
+
+        .reset-btn {
+            color: #ff4757;
+        }
+
+        .reset-btn:hover {
+            color: #ff3742;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Barra superior */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .clear-search:hover {
+            color: #ff4757;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-settings {
+            background: #f5f7ff;
+            color: #4a6cf7;
+            border: 1px solid #d6e0ff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-settings:hover {
+            background: #e1e9ff;
+        }
+
+        .notifications {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .notifications i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            font-size: 11px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Estadísticas de archivos favoritos */
+        .stats-section {
+            margin-bottom: 40px;
+        }
+
+        .stats-section h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.favorite-stat {
+            border-left: 4px solid #ffc107;
+            background: #fff8e1;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .stat-icon i {
+            font-size: 24px;
+        }
+
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Filtros de tipo */
+        .type-filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 5px;
+            background: #f5f7ff;
+            padding: 6px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .filter-tab.active {
+            background: white;
+            color: #4a6cf7;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-weight: 500;
+        }
+
+        .favorite-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .favorite-count {
+            background: #fff8e1;
+            color: #f57c00;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-clear-favorites {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffe0b2;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-clear-favorites:hover {
+            background: #ffe0b2;
+        }
+
+        /* Vista de archivos favoritos */
+        .files-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+            color: #333;
+        }
+
+        .view-options {
+            display: flex;
+            gap: 5px;
+            background: #f5f7ff;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .view-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: #4a6cf7;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Grid de archivos favoritos */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        /* Tarjeta de archivo favorito */
+        .favorite-file-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            border: 2px solid transparent;
+            border-left: 4px solid #ffc107;
+        }
+
+        .favorite-file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .favorite-file-card.selected {
+            border-color: #4a6cf7;
+            background: #f9fbff;
+        }
+
+        .favorite-file-card::before {
+            content: "\f005";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ffc107;
+            font-size: 14px;
+        }
+
+        .file-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: #f0f4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .file-icon i {
+            font-size: 24px;
+            color: #4a6cf7;
+        }
+
+        .pdf .file-icon {
+            background: #ffeaea;
+        }
+
+        .pdf .file-icon i {
+            color: #f05050;
+        }
+
+        .doc .file-icon {
+            background: #eaf2ff;
+        }
+
+        .doc .file-icon i {
+            color: #4a6cf7;
+        }
+
+        .image .file-icon {
+            background: #fff5e6;
+        }
+
+        .image .file-icon i {
+            color: #ff9500;
+        }
+
+        .video .file-icon {
+            background: #f0f5ff;
+        }
+
+        .video .file-icon i {
+            color: #7e5bef;
+        }
+
+        .folder .file-icon {
+            background: #e6f7ed;
+        }
+
+        .folder .file-icon i {
+            color: #10b981;
+        }
+
+        .file-title {
+            flex: 1;
+        }
+
+        .file-title h4 {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-title p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .file-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .time-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .time-today {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .time-yesterday {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .time-week {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .time-month {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .file-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .file-action {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .file-action:hover {
+            background: #f5f7ff;
+            color: #4a6cf7;
+        }
+
+        .remove-favorite-btn {
+            color: #ff9800;
+        }
+
+        .remove-favorite-btn:hover {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        /* Vista de tabla para archivos favoritos */
+        .favorite-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .favorite-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .favorite-table thead {
+            background: #f9fafc;
+        }
+
+        .favorite-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .favorite-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .favorite-table tbody tr:hover {
+            background: #f9faff;
+        }
+
+        .table-file-cell {
+            display: flex;
+            align-items: center;
+        }
+
+        .table-file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .table-file-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .table-file-info p {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Estado vacío */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #ddd;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #999;
+            margin-bottom: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Modales */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Configuración modal */
+        .settings-section {
+            margin-bottom: 25px;
+        }
+
+        .settings-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .settings-section h4 i {
+            color: #4a6cf7;
+        }
+
+        .settings-item {
+            margin-bottom: 15px;
+        }
+
+        .settings-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .settings-item input[type="text"],
+        .settings-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save, .btn-cancel, .btn-confirm {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: #4a6cf7;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #3a5ce5;
+        }
+
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+            }
+            
+            .search-bar {
+                max-width: 100%;
+            }
+            
+            .type-filters {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .favorite-info {
+                margin-left: 0;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .files-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .favorite-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-actions {
+                flex-direction: column;
+            }
+            
+            .top-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .filter-tabs {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Barra lateral -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-folder-open"></i>
+                <h1>File<span>Manager</span></h1>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="username">Invitado</h3>
+                    <p>No has iniciado sesión</p>
+                    <button class="btn-login" id="loginBtn">Iniciar Sesión</button>
+                </div>
+            </div>
+            
+            <nav class="menu">
+                <ul>
+                    <li><a href="Index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="mis archivos.html"><i class="fas fa-file"></i> Mis Archivos</a></li>
+                    <li><a href="compartidos.html"><i class="fas fa-share-alt"></i> Compartidos</a></li>
+                    <li><a href="recientes.html"><i class="fas fa-history"></i> Recientes</a></li>
+                    <li class="active"><a href="favoritos.html"><i class="fas fa-star"></i> Favoritos</a></li>
+                    <li><a href="papelera.html"><i class="fas fa-trash-alt"></i> Papelera</a></li>
+                </ul>
+                
+                <div class="storage-info">
+                    <div class="storage-header">
+                        <h4>Almacenamiento</h4>
+                        <span id="storageText">0 GB / 50 GB</span>
+                    </div>
+                    <div class="storage-bar">
+                        <div class="storage-progress" id="storageProgress"></div>
+                    </div>
+                    <p class="storage-text" id="storagePercent">0% utilizado</p>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" onclick="showSettingsModal()"><i class="fas fa-cog"></i> Configuración</a>
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+                <a href="#" id="resetBtn" class="reset-btn"><i class="fas fa-eraser"></i> Limpiar Todo</a>
+            </div>
+        </aside>
+        
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <!-- Barra superior -->
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar en archivos favoritos...">
+                    <button class="clear-search" id="clearSearchBtn" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="top-actions">
+                    <button class="btn-settings" onclick="showSettingsModal()">
+                        <i class="fas fa-cog"></i> Configuración
+                    </button>
+                    <div class="notifications" id="notificationsBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count" id="notificationCount">0</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Estado vacío -->
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-star"></i>
+                <h3>No hay archivos favoritos</h3>
+                <p>Marca archivos como favoritos para verlos aquí</p>
+            </div>
+            
+            <!-- Estadísticas (ocultas inicialmente) -->
+            <section class="stats-section" id="statsSection" style="display: none;">
+                <h2>Resumen de Favoritos</h2>
+                <div class="stats-grid">
+                    <div class="stat-card favorite-stat">
+                        <div class="stat-icon" style="background-color: #fff8e1;">
+                            <i class="fas fa-star" style="color: #ffc107;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalFavorites">0</h3>
+                            <p>Archivos Favoritos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #ffeaea;">
+                            <i class="fas fa-file-pdf" style="color: #f05050;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="pdfFavorites">0</h3>
+                            <p>PDF Favoritos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #fff5e6;">
+                            <i class="fas fa-file-image" style="color: #ff9500;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="imageFavorites">0</h3>
+                            <p>Imágenes Favoritas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #e6f7ed;">
+                            <i class="fas fa-folder" style="color: #10b981;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="folderFavorites">0</h3>
+                            <p>Carpetas Favoritas</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Filtros de tipo (ocultos inicialmente) -->
+            <div class="type-filters" id="typeFilters" style="display: none;">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">Todos</button>
+                    <button class="filter-tab" data-filter="pdf">PDF</button>
+                    <button class="filter-tab" data-filter="doc">Documentos</button>
+                    <button class="filter-tab" data-filter="image">Imágenes</button>
+                    <button class="filter-tab" data-filter="video">Videos</button>
+                    <button class="filter-tab" data-filter="folder">Carpetas</button>
+                </div>
+                
+                <div class="favorite-info">
+                    <div class="favorite-count" id="activeFavoriteCount">0 favoritos</div>
+                    <button class="btn-clear-favorites" id="clearFavoritesBtn">
+                        <i class="fas fa-star"></i> Quitar Todos los Favoritos
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Archivos favoritos - Vista de cuadrícula -->
+            <section class="files-section" id="filesSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Archivos Favoritos</h2>
+                    <div class="view-options">
+                        <button class="view-btn active" id="gridViewBtn">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="view-btn" id="listViewBtn">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="files-grid" id="favoriteFilesContainer">
+                    <!-- Los archivos favoritos se cargarán aquí -->
+                </div>
+                
+                <!-- Vista de tabla para archivos favoritos -->
+                <div class="favorite-table-container" id="favoriteTableContainer" style="display: none;">
+                    <div class="table-header">
+                        <h3>Archivos Favoritos</h3>
+                    </div>
+                    <table class="favorite-table">
+                        <thead>
+                            <tr>
+                                <th>Archivo</th>
+                                <th>Tamaño</th>
+                                <th>Fecha de Favorito</th>
+                                <th>Tipo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="favoriteTableBody">
+                            <!-- Las filas se llenarán con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal de configuración -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configuración de Favoritos</h3>
+                <button class="close-modal" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4><i class="fas fa-star"></i> Configuración de Favoritos</h4>
+                    <div class="settings-item">
+                        <label for="favoriteLimit">Límite de archivos favoritos:</label>
+                        <select id="favoriteLimit">
+                            <option value="50">50 archivos</option>
+                            <option value="100" selected>100 archivos</option>
+                            <option value="200">200 archivos</option>
+                            <option value="500">500 archivos</option>
+                            <option value="1000">1000 archivos</option>
+                        </select>
+                    </div>
+                    <div class="settings-item">
+                        <input type="checkbox" id="autoBackupFavorites" checked>
+                        <label for="autoBackupFavorites">Hacer backup automático de favoritos</label>
+                    </div>
+                    <div class="settings-item">
+                        <input type="checkbox" id="syncFavorites" checked>
+                        <label for="syncFavorites">Sincronizar favoritos entre dispositivos</label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4><i class="fas fa-bell"></i> Notificaciones</h4>
+                    <div class="settings-item">
+                        <input type="checkbox" id="favoriteNotifications" checked>
+                        <label for="favoriteNotifications">Notificarme sobre cambios en favoritos</label>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="btn-save" id="saveSettingsBtn">Guardar Cambios</button>
+                    <button class="btn-cancel" id="cancelSettingsBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de archivos favoritos (inicialmente vacíos)
+        let favoriteFilesData = [];
+        let selectedFiles = [];
+        let currentFilter = "all";
+        let currentView = "grid";
+
+        // Inicializar la aplicación
+        function initApp() {
+            loadFavoriteFiles();
+            updateStats();
+            setupEventListeners();
+            
+            // Intentar cargar datos del localStorage
+            loadUserFromStorage();
+            loadFavoritesFromStorage();
+            
+            // Configurar barra de progreso de almacenamiento
+            updateStorageInfo();
+        }
+
+        // Cargar usuario del localStorage
+        function loadUserFromStorage() {
+            try {
+                const savedUsername = localStorage.getItem('fileManagerUsername');
+                if (savedUsername && savedUsername !== 'Invitado') {
+                    document.getElementById('username').textContent = savedUsername;
+                }
+            } catch (e) {
+                console.log('No se pudo cargar usuario del almacenamiento');
+            }
+        }
+
+        // Cargar favoritos del localStorage
+        function loadFavoritesFromStorage() {
+            try {
+                const savedFavorites = localStorage.getItem('fileManagerFavorites');
+                if (savedFavorites) {
+                    favoriteFilesData = JSON.parse(savedFavorites);
+                }
+            } catch (e) {
+                console.log('No se pudo cargar favoritos del almacenamiento');
+            }
+        }
+
+        // Guardar favoritos en localStorage
+        function saveFavoritesToStorage() {
+            try {
+                localStorage.setItem('fileManagerFavorites', JSON.stringify(favoriteFilesData));
+            } catch (e) {
+                console.log('No se pudo guardar favoritos en almacenamiento');
+            }
+        }
+
+        // Guardar usuario en localStorage
+        function saveUserToStorage(username) {
+            try {
+                localStorage.setItem('fileManagerUsername', username);
+            } catch (e) {
+                console.log('No se pudo guardar usuario en almacenamiento');
+            }
+        }
+
+        // Actualizar información de almacenamiento
+        function updateStorageInfo() {
+            // Calcular uso de almacenamiento basado en archivos favoritos
+            let totalSize = 0;
+            favoriteFilesData.forEach(file => {
+                const sizeMatch = file.size.match(/(\d+\.?\d*)\s*(MB|KB|GB)/i);
+                if (sizeMatch) {
+                    const value = parseFloat(sizeMatch[1]);
+                    const unit = sizeMatch[2].toUpperCase();
+                    
+                    if (unit === 'GB') totalSize += value * 1000;
+                    else if (unit === 'MB') totalSize += value;
+                    else if (unit === 'KB') totalSize += value / 1000;
+                }
+            });
+            
+            const maxStorage = 50; // 50 GB
+            const usedGB = totalSize / 1000;
+            const percent = Math.min((usedGB / maxStorage) * 100, 100);
+            
+            document.getElementById('storageText').textContent = `${usedGB.toFixed(2)} GB / ${maxStorage} GB`;
+            document.getElementById('storageProgress').style.width = `${percent}%`;
+            document.getElementById('storagePercent').textContent = `${percent.toFixed(1)}% utilizado`;
+        }
+
+        // Cargar archivos favoritos
+        function loadFavoriteFiles() {
+            const container = document.getElementById('favoriteFilesContainer');
+            const tableBody = document.getElementById('favoriteTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const filesSection = document.getElementById('filesSection');
+            const typeFilters = document.getElementById('typeFilters');
+            const statsSection = document.getElementById('statsSection');
+            
+            container.innerHTML = '';
+            tableBody.innerHTML = '';
+            
+            if (favoriteFilesData.length === 0) {
+                emptyState.style.display = 'block';
+                filesSection.style.display = 'none';
+                typeFilters.style.display = 'none';
+                statsSection.style.display = 'none';
+                return;
+            }
+            
+            // Mostrar contenido cuando hay archivos favoritos
+            emptyState.style.display = 'none';
+            filesSection.style.display = 'block';
+            typeFilters.style.display = 'flex';
+            statsSection.style.display = 'block';
+            
+            // Filtrar archivos según el filtro actual
+            const filteredFiles = currentFilter === 'all' 
+                ? favoriteFilesData 
+                : favoriteFilesData.filter(file => file.type === currentFilter);
+            
+            // Mostrar vista según selección
+            if (currentView === 'grid') {
+                container.style.display = 'grid';
+                document.getElementById('favoriteTableContainer').style.display = 'none';
+                
+                filteredFiles.forEach(file => {
+                    container.appendChild(createFavoriteCard(file));
+                });
+            } else {
+                container.style.display = 'none';
+                document.getElementById('favoriteTableContainer').style.display = 'block';
+                
+                filteredFiles.forEach(file => {
+                    tableBody.appendChild(createFavoriteTableRow(file));
+                });
+            }
+            
+            // Actualizar contador
+            document.getElementById('activeFavoriteCount').textContent = `${filteredFiles.length} favorito${filteredFiles.length !== 1 ? 's' : ''}`;
+        }
+
+        // Crear tarjeta de archivo favorito
+        function createFavoriteCard(file) {
+            const card = document.createElement('div');
+            card.className = `favorite-file-card ${file.type}`;
+            card.dataset.id = file.id;
+            card.dataset.type = file.type;
+            
+            // Determinar icono según tipo
+            let iconClass, iconText;
+            switch(file.type) {
+                case 'pdf':
+                    iconClass = 'fas fa-file-pdf';
+                    iconText = 'PDF';
+                    break;
+                case 'doc':
+                    iconClass = 'fas fa-file-word';
+                    iconText = 'Documento';
+                    break;
+                case 'image':
+                    iconClass = 'fas fa-file-image';
+                    iconText = 'Imagen';
+                    break;
+                case 'video':
+                    iconClass = 'fas fa-file-video';
+                    iconText = 'Video';
+                    break;
+                case 'folder':
+                    iconClass = 'fas fa-folder';
+                    iconText = 'Carpeta';
+                    break;
+                default:
+                    iconClass = 'fas fa-file';
+                    iconText = 'Archivo';
+            }
+            
+            card.innerHTML = `
+                <div class="file-header">
+                    <div class="file-icon">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="file-title">
+                        <h4 title="${file.name}">${file.name}</h4>
+                        <p>${iconText} • ${file.size}</p>
+                    </div>
+                </div>
+                <div class="file-details">
+                    <div>
+                        <i class="fas fa-star" style="color: #ffc107;"></i> Favorito
+                    </div>
+                    <span class="time-badge time-today">${file.favoriteDate || "Reciente"}</span>
+                </div>
+                <div class="file-actions">
+                    <button class="file-action remove-favorite-btn" data-id="${file.id}" title="Quitar de favoritos">
+                        <i class="fas fa-star"></i>
+                    </button>
+                    <button class="file-action download-btn" data-id="${file.id}" title="Descargar">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="file-action share-btn" data-id="${file.id}" title="Compartir">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                </div>
+            `;
+            
+            // Configurar eventos
+            const favoriteBtn = card.querySelector('.remove-favorite-btn');
+            favoriteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeFavorite(file.id);
+            });
+            
+            const downloadBtn = card.querySelector('.download-btn');
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadFile(file.id);
+            });
+            
+            const shareBtn = card.querySelector('.share-btn');
+            shareBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                shareFile(file.id);
+            });
+            
+            // Seleccionar archivo
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.file-action')) {
+                    toggleFileSelection(file.id, card);
+                }
+            });
+            
+            return card;
+        }
+
+        // Crear fila de tabla para archivo favorito
+        function createFavoriteTableRow(file) {
+            const row = document.createElement('tr');
+            row.dataset.id = file.id;
+            
+            // Determinar icono según tipo
+            let iconClass, iconColor;
+            switch(file.type) {
+                case 'pdf':
+                    iconClass = 'fas fa-file-pdf';
+                    iconColor = '#f05050';
+                    break;
+                case 'doc':
+                    iconClass = 'fas fa-file-word';
+                    iconColor = '#4a6cf7';
+                    break;
+                case 'image':
+                    iconClass = 'fas fa-file-image';
+                    iconColor = '#ff9500';
+                    break;
+                case 'video':
+                    iconClass = 'fas fa-file-video';
+                    iconColor = '#7e5bef';
+                    break;
+                case 'folder':
+                    iconClass = 'fas fa-folder';
+                    iconColor = '#10b981';
+                    break;
+                default:
+                    iconClass = 'fas fa-file';
+                    iconColor = '#777';
+            }
+            
+            row.innerHTML = `
+                <td>
+                    <div class="table-file-cell">
+                        <div class="table-file-icon" style="background-color: ${iconColor}20; color: ${iconColor};">
+                            <i class="${iconClass}"></i>
+                        </div>
+                        <div class="table-file-info">
+                            <h4>${file.name}</h4>
+                            <p>Agregado: ${file.favoriteDate || "Reciente"}</p>
+                        </div>
+                    </div>
+                </td>
+                <td>${file.size}</td>
+                <td>${file.favoriteDate || "Reciente"}</td>
+                <td>
+                    <span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; background: ${iconColor}20; color: ${iconColor};">${file.type.toUpperCase()}</span>
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <button class="file-action remove-favorite-btn" data-id="${file.id}" title="Quitar de favoritos">
+                            <i class="fas fa-star"></i>
+                        </button>
+                        <button class="file-action download-btn" data-id="${file.id}" title="Descargar">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            
+            // Configurar eventos
+            const favoriteBtn = row.querySelector('.remove-favorite-btn');
+            favoriteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeFavorite(file.id);
+            });
+            
+            const downloadBtn = row.querySelector('.download-btn');
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadFile(file.id);
+            });
+            
+            return row;
+        }
+
+        // Remover favorito
+        function removeFavorite(fileId) {
+            const index = favoriteFilesData.findIndex(f => f.id === fileId);
+            if (index !== -1) {
+                const removedFile = favoriteFilesData[index];
+                favoriteFilesData.splice(index, 1);
+                saveFavoritesToStorage();
+                loadFavoriteFiles();
+                updateStats();
+                updateStorageInfo();
+                showToast(`"${removedFile.name}" quitado de favoritos`, 'info');
+            }
+        }
+
+        // Descargar archivo
+        function downloadFile(fileId) {
+            const file = favoriteFilesData.find(f => f.id === fileId);
+            if (file) {
+                showToast(`Descargando: ${file.name}`, 'info');
+                // Simular descarga
+                setTimeout(() => {
+                    showToast(`Descarga completada: ${file.name}`, 'success');
+                }, 1500);
+            }
+        }
+
+        // Compartir archivo
+        function shareFile(fileId) {
+            const file = favoriteFilesData.find(f => f.id === fileId);
+            if (file) {
+                const shareUrl = `https://filemanager.com/share/${file.id}`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: `Compartir: ${file.name}`,
+                        text: `Mira este archivo que tengo en mis favoritos: ${file.name}`,
+                        url: shareUrl
+                    }).then(() => {
+                        showToast('Archivo compartido exitosamente', 'success');
+                    }).catch((error) => {
+                        console.log('Error al compartir:', error);
+                        copyToClipboard(shareUrl);
+                    });
+                } else {
+                    copyToClipboard(shareUrl);
+                }
+            }
+        }
+
+        // Copiar al portapapeles
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Enlace copiado al portapapeles', 'success');
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+                showToast('Error al copiar el enlace', 'error');
+            });
+        }
+
+        // Alternar selección de archivo
+        function toggleFileSelection(fileId, card) {
+            const index = selectedFiles.indexOf(fileId);
+            
+            if (index === -1) {
+                selectedFiles.push(fileId);
+                card.classList.add('selected');
+            } else {
+                selectedFiles.splice(index, 1);
+                card.classList.remove('selected');
+            }
+            
+            showToast(`${selectedFiles.length} archivo(s) seleccionado(s)`, 'info');
+        }
+
+        // Filtrar archivos favoritos por tipo
+        function filterFavorites(filterType) {
+            currentFilter = filterType;
+            loadFavoriteFiles();
+            
+            let filterText = '';
+            switch(filterType) {
+                case 'pdf': filterText = 'PDF'; break;
+                case 'doc': filterText = 'Documentos'; break;
+                case 'image': filterText = 'Imágenes'; break;
+                case 'video': filterText = 'Videos'; break;
+                case 'folder': filterText = 'Carpetas'; break;
+                default: filterText = 'Todos los favoritos';
+            }
+            
+            showToast(`Mostrando: ${filterText}`, 'info');
+        }
+
+        // Limpiar todos los favoritos
+        function clearAllFavorites() {
+            if (favoriteFilesData.length === 0) {
+                showToast('No hay favoritos para limpiar', 'info');
+                return;
+            }
+            
+            if (confirm(`¿Quitar todos los archivos de favoritos (${favoriteFilesData.length} archivos)?`)) {
+                favoriteFilesData.length = 0;
+                saveFavoritesToStorage();
+                selectedFiles = [];
+                loadFavoriteFiles();
+                updateStats();
+                updateStorageInfo();
+                showToast('Todos los favoritos han sido quitados', 'success');
+            }
+        }
+
+        // Buscar en archivos favoritos
+        function searchFavorites(query) {
+            const searchTerm = query.toLowerCase();
+            
+            if (currentView === 'grid') {
+                const cards = document.querySelectorAll('.favorite-file-card');
+                let foundCount = 0;
+                
+                cards.forEach(card => {
+                    const fileName = card.querySelector('h4').textContent.toLowerCase();
+                    
+                    if (fileName.includes(searchTerm)) {
+                        card.style.display = '';
+                        foundCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                if (searchTerm.length > 0) {
+                    showToast(`${foundCount} favorito(s) encontrado(s)`, 'info');
+                }
+            } else {
+                // Búsqueda en vista de tabla
+                const rows = document.querySelectorAll('#favoriteTableBody tr');
+                let foundCount = 0;
+                
+                rows.forEach(row => {
+                    const fileName = row.querySelector('h4').textContent.toLowerCase();
+                    
+                    if (fileName.includes(searchTerm)) {
+                        row.style.display = '';
+                        foundCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                if (searchTerm.length > 0) {
+                    showToast(`${foundCount} favorito(s) encontrado(s)`, 'info');
+                }
+            }
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const totalFavorites = favoriteFilesData.length;
+            const pdfFavorites = favoriteFilesData.filter(f => f.type === 'pdf').length;
+            const imageFavorites = favoriteFilesData.filter(f => f.type === 'image').length;
+            const folderFavorites = favoriteFilesData.filter(f => f.type === 'folder').length;
+            
+            document.getElementById('totalFavorites').textContent = totalFavorites;
+            document.getElementById('pdfFavorites').textContent = pdfFavorites;
+            document.getElementById('imageFavorites').textContent = imageFavorites;
+            document.getElementById('folderFavorites').textContent = folderFavorites;
+        }
+
+        // Cambiar vista (grid/lista)
+        function changeView(viewType) {
+            currentView = viewType;
+            loadFavoriteFiles();
+            showToast(`Vista ${viewType === 'grid' ? 'de cuadrícula' : 'de lista'} activada`, 'info');
+        }
+
+        // Mostrar notificación
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            
+            const bgColor = type === 'success' ? '#4CAF50' : 
+                            type === 'error' ? '#F44336' : 
+                            type === 'warning' ? '#FF9800' : '#2196F3';
+            
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background-color: ${bgColor};
+                color: white;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+            `;
+            
+            if (typeof message === 'string' && message.includes('<br>')) {
+                toast.innerHTML = message;
+            } else {
+                toast.textContent = message;
+            }
+            
+            if (!document.querySelector('style#toast-animation')) {
+                const style = document.createElement('style');
+                style.id = 'toast-animation';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes fadeOut {
+                        from { opacity: 1; }
+                        to { opacity: 0; }
+                    }
+                    .toast-notification {
+                        animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        // Mostrar modal de configuración
+        function showSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Login
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                const username = prompt('Ingresa tu nombre de usuario:');
+                if (username && username.trim()) {
+                    const newUsername = username.trim();
+                    document.getElementById('username').textContent = newUsername;
+                    saveUserToStorage(newUsername);
+                    showToast('¡Sesión iniciada!', 'success');
+                }
+            });
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                    document.getElementById('username').textContent = 'Invitado';
+                    saveUserToStorage('Invitado');
+                    showToast('Sesión cerrada correctamente', 'success');
+                }
+            });
+
+            // Botones de vista
+            const gridViewBtn = document.getElementById('gridViewBtn');
+            const listViewBtn = document.getElementById('listViewBtn');
+            
+            if (gridViewBtn && listViewBtn) {
+                gridViewBtn.addEventListener('click', () => {
+                    gridViewBtn.classList.add('active');
+                    listViewBtn.classList.remove('active');
+                    changeView('grid');
+                });
+                
+                listViewBtn.addEventListener('click', () => {
+                    listViewBtn.classList.add('active');
+                    gridViewBtn.classList.remove('active');
+                    changeView('list');
+                });
+            }
+            
+            // Filtros de tipo
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    filterFavorites(this.dataset.filter);
+                });
+            });
+            
+            // Limpiar favoritos
+            const clearFavoritesBtn = document.getElementById('clearFavoritesBtn');
+            if (clearFavoritesBtn) {
+                clearFavoritesBtn.addEventListener('click', clearAllFavorites);
+            }
+            
+            // Búsqueda
+            const searchInput = document.getElementById('searchInput');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value;
+                    
+                    if (clearSearchBtn) {
+                        clearSearchBtn.style.display = searchTerm ? 'block' : 'none';
+                    }
+                    
+                    searchFavorites(searchTerm);
+                });
+            }
+            
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    this.style.display = 'none';
+                    loadFavoriteFiles();
+                    searchInput.focus();
+                });
+            }
+            
+            // Configuración modal
+            const settingsModal = document.getElementById('settingsModal');
+            const closeSettingsModal = document.getElementById('closeSettingsModal');
+            const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+            const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
+            
+            if (closeSettingsModal) {
+                closeSettingsModal.addEventListener('click', () => {
+                    settingsModal.classList.remove('active');
+                });
+            }
+            
+            if (settingsModal) {
+                settingsModal.addEventListener('click', (e) => {
+                    if (e.target === settingsModal) {
+                        settingsModal.classList.remove('active');
+                    }
+                });
+            }
+            
+            if (saveSettingsBtn) {
+                saveSettingsBtn.addEventListener('click', () => {
+                    settingsModal.classList.remove('active');
+                    showToast('Configuración de favoritos guardada', 'success');
+                });
+            }
+            
+            if (cancelSettingsBtn) {
+                cancelSettingsBtn.addEventListener('click', () => {
+                    settingsModal.classList.remove('active');
+                });
+            }
+            
+            // Notificaciones
+            const notificationsBtn = document.getElementById('notificationsBtn');
+            const notificationCount = document.getElementById('notificationCount');
+            
+            if (notificationsBtn && notificationCount) {
+                notificationsBtn.addEventListener('click', () => {
+                    const currentCount = parseInt(notificationCount.textContent);
+                    if (currentCount > 0) {
+                        notificationCount.textContent = '0';
+                        notificationCount.style.display = 'none';
+                        showToast('Notificaciones marcadas como leídas', 'success');
+                    }
+                });
+            }
+            
+            // Limpiar todo
+            const resetBtn = document.getElementById('resetBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (confirm('¿Estás seguro de que quieres limpiar todos los datos? Esta acción no se puede deshacer.')) {
+                        favoriteFilesData.length = 0;
+                        selectedFiles = [];
+                        saveFavoritesToStorage();
+                        loadFavoriteFiles();
+                        updateStats();
+                        updateStorageInfo();
+                        showToast('Todos los datos han sido limpiados', 'success');
+                    }
+                });
+            }
+        }
+
+        // Iniciar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

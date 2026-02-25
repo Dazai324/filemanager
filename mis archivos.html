@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Archivos - FileManager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+        }
+
+        /* Contenedor principal */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Barra lateral */
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #4a6cf7;
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .logo span {
+            color: #4a6cf7;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px 0;
+            background: #f9fafc;
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 15px;
+            background: #eef1ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar i {
+            font-size: 36px;
+            color: #4a6cf7;
+        }
+
+        .user-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .user-details p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .btn-login {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #3a5ce5;
+        }
+
+        /* Menú */
+        .menu ul {
+            list-style: none;
+        }
+
+        .menu li {
+            margin-bottom: 5px;
+        }
+
+        .menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .menu li a:hover {
+            background: #f5f7ff;
+            color: #4a6cf7;
+        }
+
+        .menu li.active a {
+            background: #f5f7ff;
+            color: #4a6cf7;
+            font-weight: 500;
+        }
+
+        .menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Información de almacenamiento */
+        .storage-info {
+            background: #f9fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .storage-header h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .storage-header span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .storage-bar {
+            height: 6px;
+            background: #eef1ff;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .storage-progress {
+            height: 100%;
+            background: #4a6cf7;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .storage-text {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Pie de barra lateral */
+        .sidebar-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .sidebar-footer a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .sidebar-footer a:hover {
+            color: #4a6cf7;
+        }
+
+        .reset-btn {
+            color: #ff4757;
+        }
+
+        .reset-btn:hover {
+            color: #ff3742;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Barra superior */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .clear-search:hover {
+            color: #ff4757;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-upload {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-upload:hover {
+            background: #3a5ce5;
+        }
+
+        .btn-settings {
+            background: #f5f7ff;
+            color: #4a6cf7;
+            border: 1px solid #d6e0ff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-settings:hover {
+            background: #e1e9ff;
+        }
+
+        .notifications {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .notifications i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            font-size: 11px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Filtros */
+        .filters-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 5px;
+            background: #f5f7ff;
+            padding: 6px;
+            border-radius: 8px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .filter-tab.active {
+            background: white;
+            color: #4a6cf7;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-weight: 500;
+        }
+
+        /* Vista de archivos */
+        .files-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+            color: #333;
+        }
+
+        .view-options {
+            display: flex;
+            gap: 5px;
+            background: #f5f7ff;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .view-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: #4a6cf7;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Grid de archivos */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .file-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .file-card.selected {
+            border-color: #4a6cf7;
+            background: #f9fbff;
+        }
+
+        .file-card.favorite::before {
+            content: "\f005";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ffc107;
+            font-size: 14px;
+        }
+
+        .file-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: #f0f4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        .file-icon i {
+            font-size: 28px;
+            color: #4a6cf7;
+        }
+
+        .pdf .file-icon {
+            background: #ffeaea;
+        }
+
+        .pdf .file-icon i {
+            color: #f05050;
+        }
+
+        .doc .file-icon {
+            background: #eaf2ff;
+        }
+
+        .doc .file-icon i {
+            color: #4a6cf7;
+        }
+
+        .image .file-icon {
+            background: #fff5e6;
+        }
+
+        .image .file-icon i {
+            color: #ff9500;
+        }
+
+        .video .file-icon {
+            background: #f0f5ff;
+        }
+
+        .video .file-icon i {
+            color: #7e5bef;
+        }
+
+        .folder .file-icon {
+            background: #e6f7ed;
+        }
+
+        .folder .file-icon i {
+            color: #10b981;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .file-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .file-action {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .file-action:hover {
+            background: #f5f7ff;
+            color: #4a6cf7;
+        }
+
+        /* Estado vacío */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #ddd;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #999;
+            margin-bottom: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-empty-upload {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-empty-upload:hover {
+            background: #3a5ce5;
+        }
+
+        /* Modales */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Upload modal */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #4a6cf7;
+            background: #f9faff;
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: #4a6cf7;
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .btn-select {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-select:hover {
+            background: #3a5ce5;
+        }
+
+        .upload-progress {
+            text-align: center;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4a6cf7;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .upload-success {
+            text-align: center;
+            display: none;
+        }
+
+        .upload-success i {
+            font-size: 48px;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .upload-success p {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Configuración modal */
+        .settings-section {
+            margin-bottom: 25px;
+        }
+
+        .settings-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .settings-section h4 i {
+            color: #4a6cf7;
+        }
+
+        .settings-item {
+            margin-bottom: 15px;
+        }
+
+        .settings-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .settings-item input[type="text"],
+        .settings-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save, .btn-cancel, .btn-confirm {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: #4a6cf7;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #3a5ce5;
+        }
+
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+            }
+            
+            .search-bar {
+                max-width: 100%;
+            }
+            
+            .filters-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .files-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-actions {
+                flex-direction: column;
+            }
+            
+            .top-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Barra lateral -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-folder-open"></i>
+                <h1>File<span>Manager</span></h1>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="username">Invitado</h3>
+                    <p>No has iniciado sesión</p>
+                    <button class="btn-login" id="loginBtn">Iniciar Sesión</button>
+                </div>
+            </div>
+            
+            <nav class="menu">
+                <ul>
+                    <li><a href="Index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li class="active"><a href="mis archivos.html"><i class="fas fa-file"></i> Mis Archivos</a></li>
+                    <li><a href="compartidos.html"><i class="fas fa-share-alt"></i> Compartidos</a></li>
+                    <li><a href="recientes.html"><i class="fas fa-history"></i> Recientes</a></li>
+                    <li><a href="favoritos.html"><i class="fas fa-star"></i> Favoritos</a></li>
+                    <li><a href="papelera.html"><i class="fas fa-trash-alt"></i> Papelera</a></li>
+                </ul>
+                
+                <div class="storage-info">
+                    <div class="storage-header">
+                        <h4>Almacenamiento</h4>
+                        <span id="storageText">0 GB / 50 GB</span>
+                    </div>
+                    <div class="storage-bar">
+                        <div class="storage-progress" id="storageProgress"></div>
+                    </div>
+                    <p class="storage-text" id="storagePercent">0% utilizado</p>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" onclick="showSettingsModal()"><i class="fas fa-cog"></i> Configuración</a>
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+                <a href="#" id="resetBtn" class="reset-btn"><i class="fas fa-eraser"></i> Limpiar Todo</a>
+            </div>
+        </aside>
+        
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <!-- Barra superior -->
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar archivos...">
+                    <button class="clear-search" id="clearSearchBtn" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="top-actions">
+                    <button class="btn-settings" onclick="showSettingsModal()">
+                        <i class="fas fa-cog"></i> Configuración
+                    </button>
+                    <button class="btn-upload" id="uploadBtn">
+                        <i class="fas fa-cloud-upload-alt"></i> Subir Archivo
+                    </button>
+                    <div class="notifications" id="notificationsBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count" id="notificationCount">0</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Filtros (ocultos inicialmente) -->
+            <div class="filters-container" id="filtersContainer" style="display: none;">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">Todos</button>
+                    <button class="filter-tab" data-filter="pdf">PDF</button>
+                    <button class="filter-tab" data-filter="doc">Documentos</button>
+                    <button class="filter-tab" data-filter="image">Imágenes</button>
+                    <button class="filter-tab" data-filter="video">Videos</button>
+                    <button class="filter-tab" data-filter="folder">Carpetas</button>
+                </div>
+            </div>
+            
+            <!-- Estado vacío -->
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-folder-open"></i>
+                <h3>No tienes archivos aún</h3>
+                <p>Empieza subiendo tu primer archivo usando el botón "Subir Archivo"</p>
+                <button class="btn-empty-upload" id="emptyUploadBtn">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Subir Primer Archivo
+                </button>
+            </div>
+            
+            <!-- Archivos recientes -->
+            <section class="files-section" id="recentSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Archivos Recientes</h2>
+                    <div class="view-options">
+                        <button class="view-btn active" id="gridViewBtn">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="view-btn" id="listViewBtn">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="files-grid" id="recentFilesContainer">
+                    <!-- Los archivos recientes se cargarán aquí -->
+                </div>
+            </section>
+            
+            <!-- Todos los archivos -->
+            <section class="files-section" id="allFilesSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Todos los Archivos</h2>
+                </div>
+                
+                <div class="files-grid" id="allFilesContainer">
+                    <!-- Todos los archivos se cargarán aquí -->
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal para subir archivos -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Subir Archivos</h3>
+                <button class="close-modal" id="closeUploadModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arrastra y suelta tus archivos aquí</p>
+                    <p class="upload-subtext">o</p>
+                    <button class="btn-select" id="selectFilesBtn">Seleccionar Archivos</button>
+                    <input type="file" id="fileInput" multiple style="display: none;">
+                </div>
+                <div class="upload-progress" id="uploadProgress">
+                    <p id="uploadStatus">Subiendo archivos...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                <div class="upload-success" id="uploadSuccess">
+                    <i class="fas fa-check-circle"></i>
+                    <p id="successMessage">¡Archivo subido exitosamente!</p>
+                    <button class="btn-select" id="closeUploadBtn">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de configuración -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configuración</h3>
+                <button class="close-modal" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4><i class="fas fa-bell"></i> Notificaciones</h4>
+                    <div class="settings-item">
+                        <input type="checkbox" id="notifications" checked>
+                        <label for="notifications">Recibir notificaciones por email</label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4><i class="fas fa-paint-brush"></i> Apariencia</h4>
+                    <div class="settings-item">
+                        <label for="themeSelect">Tema:</label>
+                        <select id="themeSelect">
+                            <option value="light">Claro</option>
+                            <option value="dark">Oscuro</option>
+                            <option value="auto">Automático</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="btn-save" id="saveSettingsBtn">Guardar Cambios</button>
+                    <button class="btn-cancel" id="cancelSettingsBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de archivos (inicialmente vacíos)
+        let filesData = [];
+
+        let selectedFiles = [];
+        let currentFilter = "all";
+        let currentView = "grid";
+
+        // Inicializar la aplicación
+        function initApp() {
+            loadFiles();
+            updateStorageInfo();
+            setupEventListeners();
+            
+            // Intentar cargar datos del localStorage
+            loadUserFromStorage();
+        }
+
+        // Cargar usuario del localStorage
+        function loadUserFromStorage() {
+            try {
+                const savedUsername = localStorage.getItem('fileManagerUsername');
+                if (savedUsername && savedUsername !== 'Invitado') {
+                    document.getElementById('username').textContent = savedUsername;
+                }
+            } catch (e) {
+                console.log('No se pudo cargar usuario del almacenamiento');
+            }
+        }
+
+        // Guardar usuario en localStorage
+        function saveUserToStorage(username) {
+            try {
+                localStorage.setItem('fileManagerUsername', username);
+            } catch (e) {
+                console.log('No se pudo guardar usuario en almacenamiento');
+            }
+        }
+
+        // Cargar archivos
+        function loadFiles() {
+            const recentContainer = document.getElementById('recentFilesContainer');
+            const allContainer = document.getElementById('allFilesContainer');
+            const emptyState = document.getElementById('emptyState');
+            const recentSection = document.getElementById('recentSection');
+            const allFilesSection = document.getElementById('allFilesSection');
+            const filtersContainer = document.getElementById('filtersContainer');
+            
+            // Limpiar contenedores
+            recentContainer.innerHTML = '';
+            allContainer.innerHTML = '';
+            
+            if (filesData.length === 0) {
+                emptyState.style.display = 'block';
+                recentSection.style.display = 'none';
+                allFilesSection.style.display = 'none';
+                filtersContainer.style.display = 'none';
+                return;
+            }
+            
+            // Mostrar contenido cuando hay archivos
+            emptyState.style.display = 'none';
+            recentSection.style.display = 'block';
+            allFilesSection.style.display = 'block';
+            filtersContainer.style.display = 'flex';
+            
+            // Separar archivos recientes (hoy y ayer)
+            const recentFiles = filesData.filter(file => file.date === "Hoy" || file.date === "Ayer");
+            const allFiles = [...filesData];
+            
+            // Mostrar archivos recientes
+            recentFiles.forEach(file => {
+                recentContainer.appendChild(createFileCard(file));
+            });
+            
+            // Mostrar todos los archivos
+            allFiles.forEach(file => {
+                allContainer.appendChild(createFileCard(file));
+            });
+        }
+
+        // Crear tarjeta de archivo
+        function createFileCard(file) {
+            const card = document.createElement('div');
+            card.className = `file-card ${file.type}`;
+            card.dataset.id = file.id;
+            card.dataset.type = file.type;
+            
+            if (file.favorite) {
+                card.classList.add('favorite');
+            }
+            
+            // Determinar icono según tipo
+            let iconClass, iconText;
+            switch(file.type) {
+                case 'pdf':
+                    iconClass = 'fas fa-file-pdf';
+                    iconText = 'PDF';
+                    break;
+                case 'doc':
+                    iconClass = 'fas fa-file-word';
+                    iconText = 'Documento';
+                    break;
+                case 'image':
+                    iconClass = 'fas fa-file-image';
+                    iconText = 'Imagen';
+                    break;
+                case 'video':
+                    iconClass = 'fas fa-file-video';
+                    iconText = 'Video';
+                    break;
+                case 'folder':
+                    iconClass = 'fas fa-folder';
+                    iconText = 'Carpeta';
+                    break;
+                default:
+                    iconClass = 'fas fa-file';
+                    iconText = 'Archivo';
+            }
+            
+            card.innerHTML = `
+                <div class="file-icon">
+                    <i class="${iconClass}"></i>
+                </div>
+                <h4 class="file-name" title="${file.name}.${file.type}">${file.name}</h4>
+                <div class="file-info">
+                    <div>${file.size}</div>
+                    <div>${file.date}</div>
+                </div>
+                <div class="file-actions">
+                    <button class="file-action favorite-btn" data-id="${file.id}" title="${file.favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}">
+                        <i class="${file.favorite ? 'fas' : 'far'} fa-star"></i>
+                    </button>
+                    <button class="file-action download-btn" data-id="${file.id}" title="Descargar">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="file-action more-btn" data-id="${file.id}" title="Más opciones">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                </div>
+            `;
+            
+            // Configurar eventos
+            const favoriteBtn = card.querySelector('.favorite-btn');
+            favoriteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleFavorite(file.id);
+            });
+            
+            const downloadBtn = card.querySelector('.download-btn');
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadFile(file.id);
+            });
+            
+            const moreBtn = card.querySelector('.more-btn');
+            moreBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showFileOptions(file.id);
+            });
+            
+            // Seleccionar archivo
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.file-action')) {
+                    toggleFileSelection(file.id, card);
+                }
+            });
+            
+            return card;
+        }
+
+        // Alternar selección de archivo
+        function toggleFileSelection(fileId, card) {
+            const index = selectedFiles.indexOf(fileId);
+            
+            if (index === -1) {
+                selectedFiles.push(fileId);
+                card.classList.add('selected');
+            } else {
+                selectedFiles.splice(index, 1);
+                card.classList.remove('selected');
+            }
+            
+            showToast(`${selectedFiles.length} archivo(s) seleccionado(s)`, 'info');
+        }
+
+        // Alternar favorito
+        function toggleFavorite(fileId) {
+            const file = filesData.find(f => f.id === fileId);
+            if (file) {
+                file.favorite = !file.favorite;
+                
+                // Actualizar iconos en todas las tarjetas
+                document.querySelectorAll(`[data-id="${fileId}"] .favorite-btn i`).forEach(icon => {
+                    icon.className = file.favorite ? 'fas fa-star' : 'far fa-star';
+                });
+                
+                // Actualizar clase de la tarjeta
+                const cards = document.querySelectorAll(`[data-id="${fileId}"]`);
+                cards.forEach(card => {
+                    if (file.favorite) {
+                        card.classList.add('favorite');
+                    } else {
+                        card.classList.remove('favorite');
+                    }
+                });
+                
+                showToast(`Archivo ${file.favorite ? 'agregado a' : 'eliminado de'} favoritos`, 'success');
+            }
+        }
+
+        // Descargar archivo
+        function downloadFile(fileId) {
+            const file = filesData.find(f => f.id === fileId);
+            if (file) {
+                showToast(`Descargando: ${file.name}`, 'info');
+                // Simular descarga
+                setTimeout(() => {
+                    showToast(`Descarga completada: ${file.name}`, 'success');
+                }, 1500);
+            }
+        }
+
+        // Mostrar opciones del archivo
+        function showFileOptions(fileId) {
+            const file = filesData.find(f => f.id === fileId);
+            if (file) {
+                const options = `
+                    <strong>${file.name}</strong><br>
+                    Tipo: ${file.type.toUpperCase()}<br>
+                    Tamaño: ${file.size}<br>
+                    Fecha: ${file.date}<br>
+                    ${file.favorite ? '★ Favorito' : '☆ No favorito'}
+                `;
+                showToast(options, 'info');
+            }
+        }
+
+        // Filtrar archivos
+        function filterFiles(filterType) {
+            currentFilter = filterType;
+            const cards = document.querySelectorAll('#allFilesContainer .file-card, #recentFilesContainer .file-card');
+            
+            cards.forEach(card => {
+                if (filterType === 'all' || card.dataset.type === filterType) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            showToast(`Mostrando: ${filterType === 'all' ? 'Todos los archivos' : filterType}`, 'info');
+        }
+
+        // Buscar archivos
+        function searchFiles(query) {
+            const searchTerm = query.toLowerCase();
+            const cards = document.querySelectorAll('.file-card');
+            let foundCount = 0;
+            
+            cards.forEach(card => {
+                const fileName = card.querySelector('.file-name').textContent.toLowerCase();
+                
+                if (fileName.includes(searchTerm)) {
+                    card.style.display = '';
+                    foundCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            if (searchTerm.length > 0) {
+                showToast(`${foundCount} archivo(s) encontrado(s)`, 'info');
+            }
+        }
+
+        // Actualizar información de almacenamiento
+        function updateStorageInfo() {
+            // Calcular tamaño total
+            let totalSize = 0;
+            filesData.forEach(file => {
+                const sizeValue = parseFloat(file.size);
+                const unit = file.size.split(' ')[1];
+                
+                if (unit === 'GB') totalSize += sizeValue * 1024;
+                else if (unit === 'MB') totalSize += sizeValue;
+                else if (unit === 'KB') totalSize += sizeValue / 1024;
+            });
+            
+            // Calcular porcentaje
+            const totalStorage = 50 * 1024; // 50GB en MB
+            const percentage = Math.min((totalSize / totalStorage) * 100, 100);
+            const usedGB = (totalSize / 1024).toFixed(1);
+            
+            // Actualizar elementos
+            const storageProgress = document.getElementById('storageProgress');
+            const storageText = document.getElementById('storageText');
+            const storagePercent = document.getElementById('storagePercent');
+            
+            if (storageProgress) storageProgress.style.width = `${percentage}%`;
+            if (storageText) storageText.textContent = `${usedGB} GB / 50 GB`;
+            if (storagePercent) storagePercent.textContent = `${percentage.toFixed(1)}% utilizado`;
+        }
+
+        // Mostrar notificación
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            
+            // Convertir saltos de línea a HTML
+            if (typeof message === 'string' && message.includes('<br>')) {
+                toast.innerHTML = message;
+            } else {
+                toast.textContent = message;
+            }
+            
+            const bgColor = type === 'success' ? '#4CAF50' : 
+                            type === 'error' ? '#F44336' : 
+                            type === 'warning' ? '#FF9800' : '#2196F3';
+            
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background-color: ${bgColor};
+                color: white;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+            `;
+            
+            if (!document.querySelector('style#toast-animation')) {
+                const style = document.createElement('style');
+                style.id = 'toast-animation';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes fadeOut {
+                        from { opacity: 1; }
+                        to { opacity: 0; }
+                    }
+                    .toast-notification {
+                        animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        // Simular subida de archivos
+        function simulateUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadSuccess = document.getElementById('uploadSuccess');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (!uploadArea || !uploadProgress || !uploadSuccess || !progressFill) {
+                return;
+            }
+            
+            // Ocultar área de subida, mostrar progreso
+            uploadArea.style.display = 'none';
+            uploadProgress.style.display = 'block';
+            progressFill.style.width = '0%';
+            
+            // Simular progreso
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                progressFill.style.width = `${Math.min(progress, 100)}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    // Mostrar éxito
+                    setTimeout(() => {
+                        uploadProgress.style.display = 'none';
+                        uploadSuccess.style.display = 'block';
+                        
+                        // Añadir nuevo archivo
+                        const fileTypes = [
+                            { type: "pdf", icon: "fa-file-pdf" },
+                            { type: "doc", icon: "fa-file-word" },
+                            { type: "image", icon: "fa-file-image" },
+                            { type: "video", icon: "fa-file-video" }
+                        ];
+                        
+                        const fileType = fileTypes[Math.floor(Math.random() * fileTypes.length)];
+                        const newId = filesData.length > 0 ? Math.max(...filesData.map(f => f.id)) + 1 : 1;
+                        
+                        const newFile = {
+                            id: newId,
+                            name: `Archivo_${newId}`,
+                            type: fileType.type,
+                            size: `${(Math.random() * 10 + 1).toFixed(1)} MB`,
+                            date: "Hoy",
+                            favorite: Math.random() > 0.5
+                        };
+                        
+                        filesData.unshift(newFile);
+                        
+                        // Actualizar todo
+                        loadFiles();
+                        updateStorageInfo();
+                        
+                        showToast(`Archivo "${newFile.name}" subido correctamente`, 'success');
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        // Resetear modal de upload
+        function resetUploadModal() {
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadSuccess = document.getElementById('uploadSuccess');
+            const fileInput = document.getElementById('fileInput');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (uploadArea) uploadArea.style.display = 'block';
+            if (uploadProgress) uploadProgress.style.display = 'none';
+            if (uploadSuccess) uploadSuccess.style.display = 'none';
+            if (fileInput) fileInput.value = '';
+            if (progressFill) progressFill.style.width = '0%';
+        }
+
+        // Mostrar modal de configuración
+        function showSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Login
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                const username = prompt('Ingresa tu nombre de usuario:');
+                if (username && username.trim()) {
+                    const newUsername = username.trim();
+                    document.getElementById('username').textContent = newUsername;
+                    saveUserToStorage(newUsername);
+                    showToast('¡Sesión iniciada!', 'success');
+                }
+            });
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                    document.getElementById('username').textContent = 'Invitado';
+                    saveUserToStorage('Invitado');
+                    showToast('Sesión cerrada correctamente', 'success');
+                }
+            });
+
+            // Upload desde estado vacío
+            document.getElementById('emptyUploadBtn').addEventListener('click', () => {
+                document.getElementById('uploadModal').classList.add('active');
+                resetUploadModal();
+            });
+
+            // Botones de vista
+            const gridViewBtn = document.getElementById('gridViewBtn');
+            const listViewBtn = document.getElementById('listViewBtn');
+            
+            if (gridViewBtn && listViewBtn) {
+                gridViewBtn.addEventListener('click', () => {
+                    gridViewBtn.classList.add('active');
+                    listViewBtn.classList.remove('active');
+                    document.getElementById('allFilesContainer').classList.remove('list-view');
+                    document.getElementById('recentFilesContainer').classList.remove('list-view');
+                    showToast('Vista de cuadrícula activada', 'info');
+                });
+                
+                listViewBtn.addEventListener('click', () => {
+                    listViewBtn.classList.add('active');
+                    gridViewBtn.classList.remove('active');
+                    document.getElementById('allFilesContainer').classList.add('list-view');
+                    document.getElementById('recentFilesContainer').classList.add('list-view');
+                    showToast('Vista de lista activada', 'info');
+                });
+            }
+            
+            // Filtros
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    filterFiles(this.dataset.filter);
+                });
+            });
+            
+            // Búsqueda
+            const searchInput = document.getElementById('searchInput');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value;
+                    
+                    if (clearSearchBtn) {
+                        clearSearchBtn.style.display = searchTerm ? 'block' : 'none';
+                    }
+                    
+                    searchFiles(searchTerm);
+                });
+            }
+            
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    this.style.display = 'none';
+                    filterFiles(currentFilter);
+                    searchInput.focus();
+                });
+            }
+            
+            // Subir archivos
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadModal = document.getElementById('uploadModal');
+            const closeUploadModal = document.getElementById('closeUploadModal');
+            const selectFilesBtn = document.getElementById('selectFilesBtn');
+            const fileInput = document.getElementById('fileInput');
+            const closeUploadBtn = document.getElementById('closeUploadBtn');
+            
+            if (uploadBtn && uploadModal) {
+                uploadBtn.addEventListener('click', () => {
+                    uploadModal.classList.add('active');
+                    resetUploadModal();
+                });
+            }
+            
+            if (closeUploadModal) {
+                closeUploadModal.addEventListener('click', () => {
+                    uploadModal.classList.remove('active');
+                });
+            }
+            
+            if (uploadModal) {
+                uploadModal.addEventListener('click', (e) => {
+                    if (e.target === uploadModal) {
+                        uploadModal.classList.remove('active');
+                    }
+                });
+            }
+            
+            if (selectFilesBtn && fileInput) {
+                selectFilesBtn.addEventListener('click', () => {
+                    fileInput.click();
+                });
+                
+                fileInput.addEventListener('change', () => {
+                    if (fileInput.files.length > 0) {
+                        simulateUpload();
+                    }
+                });
+            }
+            
+            if (closeUploadBtn) {
+                closeUploadBtn.addEventListener('click', () => {
+                    uploadModal.classList.remove('active');
+                    resetUploadModal();
+                });
+            }
+            
+            // Arrastrar y soltar
+            const uploadArea = document.getElementById('uploadArea');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.borderColor = '#4a6cf7';
+                    uploadArea.style.backgroundColor = '#f9faff';
+                });
+                
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.style.borderColor = '#ddd';
+                    uploadArea.style.backgroundColor = 'white';
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.borderColor = '#ddd';
+                    uploadArea.style.backgroundColor = 'white';
+                    
+                    if (e.dataTransfer.files.length > 0) {
+                        simulateUpload();
+                    }
+                });
+            }
+            
+            // Configuración modal
+            const settingsModal = document.getElementById('settingsModal');
+            const closeSettingsModal = document.getElementById('closeSettingsModal');
+            const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+            const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
+            
+            if (closeSettingsModal) {
+                closeSettingsModal.addEventListener('click', () => {
+                    settingsModal.classList.remove('active');
+                });
+            }
+            
+            if (settingsModal) {
+                settingsModal.addEventListener('click', (e) => {
+                    if (e.target === settingsModal) {
+                        settingsModal.classList.remove('active');
+                    }
+                });
+            }
+            
+            if (saveSettingsBtn) {
+                saveSettingsBtn.addEventListener('click', () => {
+                    settingsModal.classList.remove('active');
+                    showToast('Configuración guardada', 'success');
+                });
+            }
+            
+            if (cancelSettingsBtn) {
+                cancelSettingsBtn.addEventListener('click', () => {
+                    settingsModal.classList.remove('active');
+                });
+            }
+            
+            // Notificaciones
+            const notificationsBtn = document.getElementById('notificationsBtn');
+            const notificationCount = document.getElementById('notificationCount');
+            
+            if (notificationsBtn && notificationCount) {
+                notificationsBtn.addEventListener('click', () => {
+                    const currentCount = parseInt(notificationCount.textContent);
+                    if (currentCount > 0) {
+                        notificationCount.textContent = '0';
+                        notificationCount.style.display = 'none';
+                        showToast('Notificaciones marcadas como leídas', 'success');
+                    }
+                });
+            }
+            
+            // Limpiar todo
+            const resetBtn = document.getElementById('resetBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (confirm('¿Estás seguro de que quieres limpiar todos los datos? Esta acción no se puede deshacer.')) {
+                        filesData.length = 0;
+                        selectedFiles = [];
+                        loadFiles();
+                        updateStorageInfo();
+                        showToast('Todos los datos han sido limpiados', 'success');
+                    }
+                });
+            }
+        }
+
+        // Iniciar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

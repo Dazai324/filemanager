@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papelera - FileManager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+        }
+
+        /* Contenedor principal */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Barra lateral */
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #4a6cf7;
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .logo span {
+            color: #4a6cf7;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px 0;
+            background: #f9fafc;
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 15px;
+            background: #eef1ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar i {
+            font-size: 36px;
+            color: #4a6cf7;
+        }
+
+        .user-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .user-details p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .btn-login {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #3a5ce5;
+        }
+
+        /* Menú */
+        .menu ul {
+            list-style: none;
+        }
+
+        .menu li {
+            margin-bottom: 5px;
+        }
+
+        .menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .menu li a:hover {
+            background: #f5f7ff;
+            color: #4a6cf7;
+        }
+
+        .menu li.active a {
+            background: #f5f7ff;
+            color: #4a6cf7;
+            font-weight: 500;
+        }
+
+        .menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Información de almacenamiento */
+        .storage-info {
+            background: #f9fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .storage-header h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .storage-header span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .storage-bar {
+            height: 6px;
+            background: #eef1ff;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .storage-progress {
+            height: 100%;
+            background: #4a6cf7;
+            width: 25%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .storage-text {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Pie de barra lateral */
+        .sidebar-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .sidebar-footer a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .sidebar-footer a:hover {
+            color: #4a6cf7;
+        }
+
+        .reset-btn {
+            color: #ff4757;
+        }
+
+        .reset-btn:hover {
+            color: #ff3742;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Barra superior */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .clear-search:hover {
+            color: #ff4757;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-settings {
+            background: #f5f7ff;
+            color: #4a6cf7;
+            border: 1px solid #d6e0ff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-settings:hover {
+            background: #e1e9ff;
+        }
+
+        .btn-empty-trash {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-empty-trash:hover {
+            background: #ff3742;
+        }
+
+        .notifications {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .notifications i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            font-size: 11px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Estadísticas de papelera */
+        .stats-section {
+            margin-bottom: 40px;
+        }
+
+        .stats-section h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .stat-icon i {
+            font-size: 24px;
+        }
+
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Filtros de papelera */
+        .filters-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 5px;
+            background: #f5f7ff;
+            padding: 6px;
+            border-radius: 8px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .filter-tab.active {
+            background: white;
+            color: #4a6cf7;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-weight: 500;
+        }
+
+        .trash-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .trash-count {
+            background: #ffebee;
+            color: #d32f2f;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn-restore-all {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-restore-all:hover {
+            background: #43a047;
+        }
+
+        /* Vista de archivos en papelera */
+        .files-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+            color: #333;
+        }
+
+        .view-options {
+            display: flex;
+            gap: 5px;
+            background: #f5f7ff;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .view-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: #4a6cf7;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Grid de archivos en papelera */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        /* Tarjeta de archivo en papelera */
+        .trash-file-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .trash-file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .trash-file-card.selected {
+            border-color: #4a6cf7;
+            background: #f9fbff;
+        }
+
+        .trash-file-card.expiring::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 30px 30px 0;
+            border-color: transparent #ff9800 transparent transparent;
+        }
+
+        .trash-file-card.expiring::after {
+            content: "\f252";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 3px;
+            right: 5px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .trash-file-card.expired::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 30px 30px 0;
+            border-color: transparent #f44336 transparent transparent;
+        }
+
+        .trash-file-card.expired::after {
+            content: "\f017";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 3px;
+            right: 5px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .file-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: #f0f4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .file-icon i {
+            font-size: 24px;
+            color: #4a6cf7;
+        }
+
+        .pdf .file-icon {
+            background: #ffeaea;
+        }
+
+        .pdf .file-icon i {
+            color: #f05050;
+        }
+
+        .doc .file-icon {
+            background: #eaf2ff;
+        }
+
+        .doc .file-icon i {
+            color: #4a6cf7;
+        }
+
+        .image .file-icon {
+            background: #fff5e6;
+        }
+
+        .image .file-icon i {
+            color: #ff9500;
+        }
+
+        .video .file-icon {
+            background: #f0f5ff;
+        }
+
+        .video .file-icon i {
+            color: #7e5bef;
+        }
+
+        .folder .file-icon {
+            background: #e6f7ed;
+        }
+
+        .folder .file-icon i {
+            color: #10b981;
+        }
+
+        .file-title {
+            flex: 1;
+        }
+
+        .file-title h4 {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-title p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .file-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .deleted-time {
+            color: #ff4757;
+            font-weight: 500;
+        }
+
+        .expiry-time {
+            background: #fff3e0;
+            color: #ef6c00;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .file-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .file-action {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .file-action:hover {
+            background: #f5f7ff;
+            color: #4a6cf7;
+        }
+
+        .restore-btn:hover {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+
+        .delete-btn:hover {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        /* Vista de tabla para papelera */
+        .trash-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .trash-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .trash-table thead {
+            background: #f9fafc;
+        }
+
+        .trash-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .trash-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .trash-table tbody tr:hover {
+            background: #f9faff;
+        }
+
+        .table-file-cell {
+            display: flex;
+            align-items: center;
+        }
+
+        .table-file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .table-file-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .table-file-info p {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Sin archivos en papelera */
+        .no-files {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #ddd;
+        }
+
+        .no-files i {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .no-files p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        /* Información de vaciado automático */
+        .auto-clean-section {
+            background: #fff3e0;
+            border: 1px solid #ffcc80;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .auto-clean-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .auto-clean-header i {
+            color: #ff9800;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .auto-clean-header h3 {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .auto-clean-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .auto-clean-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-label {
+            font-size: 13px;
+            color: #666;
+            min-width: 120px;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            height: 8px;
+            background: #ffe0b2;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #ff9800;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .progress-time {
+            font-size: 13px;
+            color: #ff9800;
+            font-weight: 500;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        /* Modales */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Modal de confirmación */
+        .confirm-icon {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .confirm-icon i {
+            font-size: 60px;
+            color: #ff9800;
+        }
+
+        .confirm-message {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .confirm-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .confirm-details p {
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-confirm, .btn-cancel, .btn-warning {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-confirm {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #43a047;
+        }
+
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #f57c00;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        /* Configuración modal */
+        .settings-section {
+            margin-bottom: 25px;
+        }
+
+        .settings-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .settings-section h4 i {
+            color: #4a6cf7;
+        }
+
+        .settings-item {
+            margin-bottom: 15px;
+        }
+
+        .settings-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .settings-item input[type="text"],
+        .settings-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save {
+            background: #4a6cf7;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .btn-save:hover {
+            background: #3a5ce5;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+            }
+            
+            .search-bar {
+                max-width: 100%;
+            }
+            
+            .filters-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .trash-info {
+                margin-left: 0;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .files-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .trash-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .confirm-actions,
+            .settings-actions {
+                flex-direction: column;
+            }
+            
+            .top-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Barra lateral -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-folder-open"></i>
+                <h1>File<span>Manager</span></h1>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="username">Invitado</h3>
+                    <p>No has iniciado sesión</p>
+                    <button class="btn-login" id="loginBtn">Iniciar Sesión</button>
+                </div>
+            </div>
+            
+            <nav class="menu">
+                <ul>
+                    <li><a href="Index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="mis archivos.html"><i class="fas fa-file"></i> Mis Archivos</a></li>
+                    <li><a href="compartidos.html"><i class="fas fa-share-alt"></i> Compartidos</a></li>
+                    <li><a href="recientes.html"><i class="fas fa-history"></i> Recientes</a></li>
+                    <li><a href="favoritos.html"><i class="fas fa-star"></i> Favoritos</a></li>
+                    <li class="active"><a href="papelera.html"><i class="fas fa-trash-alt"></i> Papelera</a></li>
+                </ul>
+                
+                <div class="storage-info">
+                    <div class="storage-header">
+                        <h4>Almacenamiento</h4>
+                        <span id="storageText">0 GB / 50 GB</span>
+                    </div>
+                    <div class="storage-bar">
+                        <div class="storage-progress" id="storageProgress" style="width: 0%"></div>
+                    </div>
+                    <p class="storage-text" id="storagePercent">0% utilizado</p>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" onclick="showSettingsModal()"><i class="fas fa-cog"></i> Configuración</a>
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+                <a href="#" id="resetBtn" class="reset-btn"><i class="fas fa-eraser"></i> Limpiar Todo</a>
+            </div>
+        </aside>
+        
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <!-- Barra superior -->
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar en papelera...">
+                    <button class="clear-search" id="clearSearchBtn" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="top-actions">
+                    <button class="btn-settings" onclick="showSettingsModal()">
+                        <i class="fas fa-cog"></i> Configuración
+                    </button>
+                    <button class="btn-empty-trash" id="emptyTrashBtn">
+                        <i class="fas fa-trash"></i> Vaciar Papelera
+                    </button>
+                    <div class="notifications" id="notificationsBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count" id="notificationCount">0</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Estadísticas de papelera -->
+            <section class="stats-section">
+                <h2>Resumen de Papelera</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #ffebee;">
+                            <i class="fas fa-trash-alt" style="color: #f44336;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalTrash">0</h3>
+                            <p>Archivos en Papelera</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #e3f2fd;">
+                            <i class="fas fa-file-pdf" style="color: #2196f3;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="pdfTrash">0</h3>
+                            <p>Archivos PDF</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #fff3e0;">
+                            <i class="fas fa-clock" style="color: #ff9800;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="expiringSoon">0</h3>
+                            <p>Por expirar pronto</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #f1f8e9;">
+                            <i class="fas fa-save" style="color: #7cb342;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="spaceFreed">0 MB</h3>
+                            <p>Espacio a liberar</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Información de vaciado automático -->
+            <div class="auto-clean-section" id="autoCleanSection" style="display: none;">
+                <div class="auto-clean-header">
+                    <i class="fas fa-clock"></i>
+                    <h3>Vaciado Automático Programado</h3>
+                </div>
+                <p class="auto-clean-info">Los archivos en papelera se eliminarán automáticamente después de 30 días. Puedes restaurarlos antes de que se eliminen permanentemente.</p>
+                <div class="auto-clean-progress">
+                    <div class="progress-label">Próximo vaciado:</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="autoCleanProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-time" id="autoCleanTime">Papelera vacía</div>
+                </div>
+            </div>
+            
+            <!-- Filtros de papelera -->
+            <div class="filters-container" id="filtersContainer" style="display: none;">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">Todos</button>
+                    <button class="filter-tab" data-filter="expiring">Por expirar</button>
+                    <button class="filter-tab" data-filter="expired">Expirados</button>
+                    <button class="filter-tab" data-filter="pdf">PDF</button>
+                    <button class="filter-tab" data-filter="media">Multimedia</button>
+                </div>
+                
+                <div class="trash-info">
+                    <div class="trash-count" id="activeTrashCount">0 archivos</div>
+                    <button class="btn-restore-all" id="restoreAllBtn">
+                        <i class="fas fa-undo"></i> Restaurar Todos
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Archivos en papelera - Vista de cuadrícula -->
+            <section class="files-section">
+                <div class="section-header">
+                    <h2>Archivos en Papelera</h2>
+                    <div class="view-options">
+                        <button class="view-btn active" id="gridViewBtn">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="view-btn" id="listViewBtn">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Estado vacío -->
+                <div class="no-files" id="emptyTrashState">
+                    <i class="fas fa-trash-alt"></i>
+                    <p>La papelera está vacía</p>
+                    <p>Los archivos eliminados aparecerán aquí</p>
+                </div>
+                
+                <!-- Contenido cuando hay archivos -->
+                <div class="files-grid" id="trashFilesContainer" style="display: none;">
+                    <!-- Los archivos en papelera se cargarán aquí -->
+                </div>
+                
+                <!-- Vista de tabla para papelera -->
+                <div class="trash-table-container" id="trashTableContainer" style="display: none;">
+                    <div class="table-header">
+                        <h3>Archivos en Papelera</h3>
+                    </div>
+                    <table class="trash-table">
+                        <thead>
+                            <tr>
+                                <th>Archivo</th>
+                                <th>Tamaño</th>
+                                <th>Eliminado</th>
+                                <th>Expira</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trashTableBody">
+                            <!-- Las filas se llenarán con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal de confirmación para restaurar -->
+    <div class="modal" id="restoreModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Restaurar Archivo</h3>
+                <button class="close-modal" id="closeRestoreModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-icon">
+                    <i class="fas fa-undo"></i>
+                </div>
+                <p class="confirm-message" id="restoreMessage">¿Estás seguro de que quieres restaurar este archivo?</p>
+                <div class="confirm-details" id="restoreDetails">
+                    <!-- Los detalles se llenarán con JavaScript -->
+                </div>
+                <div class="confirm-actions">
+                    <button class="btn-confirm" id="confirmRestoreBtn">Restaurar</button>
+                    <button class="btn-cancel" id="cancelRestoreBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de confirmación para eliminar permanentemente -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Eliminar Permanentemente</h3>
+                <button class="close-modal" id="closeDeleteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <p class="confirm-message" id="deleteMessage">¿Estás seguro de que quieres eliminar permanentemente este archivo?</p>
+                <div class="confirm-details" id="deleteDetails">
+                    <!-- Los detalles se llenarán con JavaScript -->
+                </div>
+                <p class="confirm-message" style="color: #f44336; font-weight: 500;">Esta acción no se puede deshacer.</p>
+                <div class="confirm-actions">
+                    <button class="btn-danger" id="confirmDeleteBtn">Eliminar Permanentemente</button>
+                    <button class="btn-cancel" id="cancelDeleteBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de confirmación para vaciar papelera -->
+    <div class="modal" id="emptyTrashModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Vaciar Papelera</h3>
+                <button class="close-modal" id="closeEmptyTrashModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-icon">
+                    <i class="fas fa-trash"></i>
+                </div>
+                <p class="confirm-message">¿Estás seguro de que quieres vaciar toda la papelera?</p>
+                <div class="confirm-details">
+                    <p>Archivos a eliminar: <strong id="totalToDelete">0</strong></p>
+                    <p>Espacio a liberar: <strong id="spaceToFree">0 MB</strong></p>
+                </div>
+                <p class="confirm-message" style="color: #f44336; font-weight: 500;">Esta acción eliminará permanentemente todos los archivos y no se puede deshacer.</p>
+                <div class="confirm-actions">
+                    <button class="btn-danger" id="confirmEmptyTrashBtn">Vaciar Papelera</button>
+                    <button class="btn-cancel" id="cancelEmptyTrashBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de configuración -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configuración de Papelera</h3>
+                <button class="close-modal" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4><i class="fas fa-trash-alt"></i> Configuración de Papelera</h4>
+                    <div class="settings-item">
+                        <label for="trashRetention">Retención en papelera:</label>
+                        <select id="trashRetention">
+                            <option value="7">7 días</option>
+                            <option value="14">14 días</option>
+                            <option value="30" selected>30 días</option>
+                            <option value="60">60 días</option>
+                            <option value="never">Nunca (eliminación manual)</option>
+                        </select>
+                    </div>
+                    <div class="settings-item">
+                        <input type="checkbox" id="autoEmptyTrash" checked>
+                        <label for="autoEmptyTrash">Vaciado automático de papelera</label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4><i class="fas fa-bell"></i> Notificaciones</h4>
+                    <div class="settings-item">
+                        <input type="checkbox" id="trashNotifications" checked>
+                        <label for="trashNotifications">Notificarme antes del vaciado automático</label>
+                    </div>
+                    <div class="settings-item">
+                        <input type="checkbox" id="restoreNotifications" checked>
+                        <label for="restoreNotifications">Notificarme cuando restaure archivos</label>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="btn-save" id="saveSettingsBtn">Guardar Cambios</button>
+                    <button class="btn-cancel" id="cancelSettingsBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo para archivos en papelera (inicialmente vacíos)
+        let trashFilesData = [];
+
+        let selectedFiles = [];
+        let currentFilter = "all";
+        let currentView = "grid";
+        let currentFileToRestore = null;
+        let currentFileToDelete = null;
+
+        // Inicializar la aplicación
+        function initApp() {
+            loadTrashFiles();
+            updateStats();
+            updateAutoCleanInfo();
+            setupEventListeners();
+            
+            // Intentar cargar datos del localStorage
+            loadUserFromStorage();
+        }
+
+        // Cargar usuario del localStorage
+        function loadUserFromStorage() {
+            try {
+                const savedUsername = localStorage.getItem('fileManagerUsername');
+                if (savedUsername && savedUsername !== 'Invitado') {
+                    document.getElementById('username').textContent = savedUsername;
+                }
+            } catch (e) {
+                console.log('No se pudo cargar usuario del almacenamiento');
+            }
+        }
+
+        // Guardar usuario en localStorage
+        function saveUserToStorage(username) {
+            try {
+                localStorage.setItem('fileManagerUsername', username);
+            } catch (e) {
+                console.log('No se pudo guardar usuario en almacenamiento');
+            }
+        }
+
+        // Cargar archivos en papelera
+        function loadTrashFiles() {
+            const container = document.getElementById('trashFilesContainer');
+            const tableBody = document.getElementById('trashTableBody');
+            const emptyState = document.getElementById('emptyTrashState');
+            const filtersContainer = document.getElementById('filtersContainer');
+            const autoCleanSection = document.getElementById('autoCleanSection');
+            
+            container.innerHTML = '';
+            tableBody.innerHTML = '';
+            
+            if (trashFilesData.length === 0) {
+                container.style.display = 'none';
+                document.getElementById('trashTableContainer').style.display = 'none';
+                emptyState.style.display = 'block';
+                filtersContainer.style.display = 'none';
+                autoCleanSection.style.display = 'none';
+                return;
+            }
+            
+            // Mostrar elementos cuando hay archivos
+            emptyState.style.display = 'none';
+            filtersContainer.style.display = 'flex';
+            autoCleanSection.style.display = 'block';
+            
+            // Filtrar archivos según el filtro actual
+            let filteredFiles = [];
+            
+            switch(currentFilter) {
+                case 'all':
+                    filteredFiles = trashFilesData;
+                    break;
+                case 'expiring':
+                    filteredFiles = trashFilesData.filter(file => file.status === 'expiring');
+                    break;
+                case 'expired':
+                    filteredFiles = trashFilesData.filter(file => file.status === 'expired');
+                    break;
+                case 'pdf':
+                    filteredFiles = trashFilesData.filter(file => file.type === 'pdf');
+                    break;
+                case 'media':
+                    filteredFiles = trashFilesData.filter(file => file.type === 'image' || file.type === 'video');
+                    break;
+                default:
+                    filteredFiles = trashFilesData;
+            }
+            
+            // Mostrar vista según selección
+            if (currentView === 'grid') {
+                container.style.display = 'grid';
+                document.getElementById('trashTableContainer').style.display = 'none';
+                
+                filteredFiles.forEach(file => {
+                    container.appendChild(createTrashCard(file));
+                });
+            } else {
+                container.style.display = 'none';
+                document.getElementById('trashTableContainer').style.display = 'block';
+                
+                filteredFiles.forEach(file => {
+                    tableBody.appendChild(createTrashTableRow(file));
+                });
+            }
+            
+            // Actualizar contador
+            document.getElementById('activeTrashCount').textContent = `${filteredFiles.length} archivos`;
+        }
+
+        // Crear tarjeta de archivo en papelera
+        function createTrashCard(file) {
+            const card = document.createElement('div');
+            card.className = `trash-file-card ${file.type}`;
+            card.dataset.id = file.id;
+            card.dataset.status = file.status;
+            
+            if (file.status === 'expiring') {
+                card.classList.add('expiring');
+            } else if (file.status === 'expired') {
+                card.classList.add('expired');
+            }
+            
+            if (file.favorite) {
+                card.classList.add('favorite');
+            }
+            
+            // Determinar icono según tipo
+            let iconClass, iconText;
+            switch(file.type) {
+                case 'pdf':
+                    iconClass = 'fas fa-file-pdf';
+                    iconText = 'PDF';
+                    break;
+                case 'doc':
+                    iconClass = 'fas fa-file-word';
+                    iconText = 'Documento';
+                    break;
+                case 'image':
+                    iconClass = 'fas fa-file-image';
+                    iconText = 'Imagen';
+                    break;
+                case 'video':
+                    iconClass = 'fas fa-file-video';
+                    iconText = 'Video';
+                    break;
+                case 'folder':
+                    iconClass = 'fas fa-folder';
+                    iconText = 'Carpeta';
+                    break;
+                default:
+                    iconClass = 'fas fa-file';
+                    iconText = 'Archivo';
+            }
+            
+            // Determinar texto de expiración
+            let expiryText = '';
+            if (file.daysLeft > 1) {
+                expiryText = `Expira en ${file.daysLeft} días`;
+            } else if (file.daysLeft === 1) {
+                expiryText = 'Expira mañana';
+            } else if (file.daysLeft === 0) {
+                expiryText = 'Expira hoy';
+            } else {
+                expiryText = 'Expirado';
+            }
+            
+            card.innerHTML = `
+                <div class="file-header">
+                    <div class="file-icon">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="file-title">
+                        <h4 title="${file.name}">${file.name}</h4>
+                        <p>${iconText} • ${file.size}</p>
+                    </div>
+                </div>
+                <div class="file-details">
+                    <div class="deleted-time">
+                        <i class="fas fa-trash"></i> ${file.deletedDate}
+                    </div>
+                    <span class="expiry-time">${expiryText}</span>
+                </div>
+                <div class="file-actions">
+                    <button class="file-action restore-btn" data-id="${file.id}" title="Restaurar">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                    <button class="file-action delete-btn" data-id="${file.id}" title="Eliminar permanentemente">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button class="file-action info-btn" data-id="${file.id}" title="Ver información">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                </div>
+            `;
+            
+            // Configurar eventos
+            const restoreBtn = card.querySelector('.restore-btn');
+            restoreBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showRestoreModal(file.id);
+            });
+            
+            const deleteBtn = card.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showDeleteModal(file.id);
+            });
+            
+            const infoBtn = card.querySelector('.info-btn');
+            infoBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showFileInfo(file.id);
+            });
+            
+            // Seleccionar archivo
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.file-action')) {
+                    toggleFileSelection(file.id, card);
+                }
+            });
+            
+            return card;
+        }
+
+        // Crear fila de tabla para archivo en papelera
+        function createTrashTableRow(file) {
+            const row = document.createElement('tr');
+            row.dataset.id = file.id;
+            
+            // Determinar icono según tipo
+            let iconClass, iconColor;
+            switch(file.type) {
+                case 'pdf':
+                    iconClass = 'fas fa-file-pdf';
+                    iconColor = '#f05050';
+                    break;
+                case 'doc':
+                    iconClass = 'fas fa-file-word';
+                    iconColor = '#4a6cf7';
+                    break;
+                case 'image':
+                    iconClass = 'fas fa-file-image';
+                    iconColor = '#ff9500';
+                    break;
+                case 'video':
+                    iconClass = 'fas fa-file-video';
+                    iconColor = '#7e5bef';
+                    break;
+                case 'folder':
+                    iconClass = 'fas fa-folder';
+                    iconColor = '#10b981';
+                    break;
+                default:
+                    iconClass = 'fas fa-file';
+                    iconColor = '#777';
+            }
+            
+            // Determinar texto de expiración
+            let expiryText = '';
+            let expiryClass = '';
+            if (file.daysLeft > 7) {
+                expiryText = `En ${file.daysLeft} días`;
+                expiryClass = '';
+            } else if (file.daysLeft > 1) {
+                expiryText = `En ${file.daysLeft} días`;
+                expiryClass = 'expiry-time';
+            } else if (file.daysLeft === 1) {
+                expiryText = 'Mañana';
+                expiryClass = 'expiry-time';
+            } else if (file.daysLeft === 0) {
+                expiryText = 'Hoy';
+                expiryClass = 'expiry-time';
+            } else {
+                expiryText = 'Expirado';
+                expiryClass = 'expiry-time';
+            }
+            
+            row.innerHTML = `
+                <td>
+                    <div class="table-file-cell">
+                        <div class="table-file-icon" style="background-color: ${iconColor}20; color: ${iconColor};">
+                            <i class="${iconClass}"></i>
+                        </div>
+                        <div class="table-file-info">
+                            <h4>${file.name}</h4>
+                            <p>${file.originalPath}</p>
+                        </div>
+                    </div>
+                </td>
+                <td>${file.size}</td>
+                <td>${file.deletedDate}</td>
+                <td>
+                    <span class="${expiryClass}">${expiryText}</span>
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <button class="file-action restore-btn" data-id="${file.id}" title="Restaurar">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="file-action delete-btn" data-id="${file.id}" title="Eliminar permanentemente">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+            
+            // Configurar eventos
+            const restoreBtn = row.querySelector('.restore-btn');
+            restoreBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showRestoreModal(file.id);
+            });
+            
+            const deleteBtn = row.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showDeleteModal(file.id);
+            });
+            
+            return row;
+        }
+
+        // Mostrar modal de restauración
+        function showRestoreModal(fileId) {
+            const file = trashFilesData.find(f => f.id === fileId);
+            if (!file) return;
+            
+            currentFileToRestore = fileId;
+            
+            const modal = document.getElementById('restoreModal');
+            const details = document.getElementById('restoreDetails');
+            
+            details.innerHTML = `
+                <p><strong>Archivo:</strong> ${file.name}</p>
+                <p><strong>Tamaño:</strong> ${file.size}</p>
+                <p><strong>Ubicación original:</strong> ${file.originalPath}</p>
+                <p><strong>Eliminado hace:</strong> ${file.deletedDate}</p>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        // Mostrar modal de eliminación permanente
+        function showDeleteModal(fileId) {
+            const file = trashFilesData.find(f => f.id === fileId);
+            if (!file) return;
+            
+            currentFileToDelete = fileId;
+            
+            const modal = document.getElementById('deleteModal');
+            const details = document.getElementById('deleteDetails');
+            
+            details.innerHTML = `
+                <p><strong>Archivo:</strong> ${file.name}</p>
+                <p><strong>Tamaño:</strong> ${file.size}</p>
+                <p><strong>Tipo:</strong> ${file.type.toUpperCase()}</p>
+                <p><strong>Expiración:</strong> ${file.expiryDate}</p>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        // Mostrar modal de vaciar papelera
+        function showEmptyTrashModal() {
+            if (trashFilesData.length === 0) {
+                showToast('La papelera ya está vacía', 'info');
+                return;
+            }
+            
+            const modal = document.getElementById('emptyTrashModal');
+            const totalSize = calculateTotalTrashSize();
+            
+            document.getElementById('totalToDelete').textContent = trashFilesData.length;
+            document.getElementById('spaceToFree').textContent = totalSize;
+            
+            modal.classList.add('active');
+        }
+
+        // Restaurar archivo
+        function restoreFile(fileId) {
+            const index = trashFilesData.findIndex(f => f.id === fileId);
+            if (index !== -1) {
+                const file = trashFilesData[index];
+                trashFilesData.splice(index, 1);
+                
+                // Eliminar de archivos seleccionados
+                const selectedIndex = selectedFiles.indexOf(fileId);
+                if (selectedIndex !== -1) {
+                    selectedFiles.splice(selectedIndex, 1);
+                }
+                
+                loadTrashFiles();
+                updateStats();
+                updateAutoCleanInfo();
+                
+                showToast(`"${file.name}" restaurado correctamente`, 'success');
+                
+                // Cerrar modal
+                document.getElementById('restoreModal').classList.remove('active');
+                currentFileToRestore = null;
+            }
+        }
+
+        // Eliminar archivo permanentemente
+        function deleteFilePermanently(fileId) {
+            const index = trashFilesData.findIndex(f => f.id === fileId);
+            if (index !== -1) {
+                const file = trashFilesData[index];
+                trashFilesData.splice(index, 1);
+                
+                // Eliminar de archivos seleccionados
+                const selectedIndex = selectedFiles.indexOf(fileId);
+                if (selectedIndex !== -1) {
+                    selectedFiles.splice(selectedIndex, 1);
+                }
+                
+                loadTrashFiles();
+                updateStats();
+                updateAutoCleanInfo();
+                
+                showToast(`"${file.name}" eliminado permanentemente`, 'success');
+                
+                // Cerrar modal
+                document.getElementById('deleteModal').classList.remove('active');
+                currentFileToDelete = null;
+            }
+        }
+
+        // Vaciar toda la papelera
+        function emptyTrash() {
+            if (trashFilesData.length === 0) return;
+            
+            const totalFiles = trashFilesData.length;
+            const totalSize = calculateTotalTrashSize();
+            
+            trashFilesData.length = 0;
+            selectedFiles = [];
+            
+            loadTrashFiles();
+            updateStats();
+            updateAutoCleanInfo();
+            
+            showToast(`Papelera vaciada: ${totalFiles} archivos eliminados (${totalSize} liberados)`, 'success');
+            
+            // Cerrar modal
+            document.getElementById('emptyTrashModal').classList.remove('active');
+        }
+
+        // Restaurar todos los archivos
+        function restoreAllFiles() {
+            if (trashFilesData.length === 0) {
+                showToast('No hay archivos para restaurar', 'info');
+                return;
+            }
+            
+            if (confirm(`¿Restaurar todos los ${trashFilesData.length} archivos de la papelera?`)) {
+                const totalFiles = trashFilesData.length;
+                trashFilesData.length = 0;
+                selectedFiles = [];
+                
+                loadTrashFiles();
+                updateStats();
+                updateAutoCleanInfo();
+                
+                showToast(`${totalFiles} archivos restaurados correctamente`, 'success');
+            }
+        }
+
+        // Mostrar información del archivo
+        function showFileInfo(fileId) {
+            const file = trashFilesData.find(f => f.id === fileId);
+            if (file) {
+                const info = `
+                    Nombre: ${file.name}
+                    Tipo: ${file.type.toUpperCase()}
+                    Tamaño: ${file.size}
+                    Eliminado: ${file.deletedDate}
+                    Expira: ${file.expiryDate}
+                    Ubicación original: ${file.originalPath}
+                    ${file.favorite ? '★ Favorito' : ''}
+                `;
+                showToast(info.replace(/\n/g, '<br>'), 'info');
+            }
+        }
+
+        // Alternar selección de archivo
+        function toggleFileSelection(fileId, card) {
+            const index = selectedFiles.indexOf(fileId);
+            
+            if (index === -1) {
+                selectedFiles.push(fileId);
+                card.classList.add('selected');
+            } else {
+                selectedFiles.splice(index, 1);
+                card.classList.remove('selected');
+            }
+            
+            showToast(`${selectedFiles.length} archivo(s) seleccionado(s)`, 'info');
+        }
+
+        // Filtrar archivos en papelera
+        function filterTrashFiles(filterType) {
+            currentFilter = filterType;
+            loadTrashFiles();
+            
+            let filterText = '';
+            switch(filterType) {
+                case 'expiring': filterText = 'Archivos por expirar'; break;
+                case 'expired': filterText = 'Archivos expirados'; break;
+                case 'pdf': filterText = 'Archivos PDF'; break;
+                case 'media': filterText = 'Archivos multimedia'; break;
+                default: filterText = 'Todos los archivos en papelera';
+            }
+            
+            showToast(`Mostrando: ${filterText}`, 'info');
+        }
+
+        // Buscar en papelera
+        function searchTrashFiles(query) {
+            const searchTerm = query.toLowerCase();
+            
+            if (currentView === 'grid') {
+                const cards = document.querySelectorAll('.trash-file-card');
+                let foundCount = 0;
+                
+                cards.forEach(card => {
+                    const fileName = card.querySelector('h4').textContent.toLowerCase();
+                    
+                    if (fileName.includes(searchTerm)) {
+                        card.style.display = '';
+                        foundCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                if (searchTerm.length > 0) {
+                    showToast(`${foundCount} archivo(s) encontrado(s)`, 'info');
+                }
+            } else {
+                // Búsqueda en vista de tabla
+                const rows = document.querySelectorAll('#trashTableBody tr');
+                let foundCount = 0;
+                
+                rows.forEach(row => {
+                    const fileName = row.querySelector('h4').textContent.toLowerCase();
+                    
+                    if (fileName.includes(searchTerm)) {
+                        row.style.display = '';
+                        foundCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                if (searchTerm.length > 0) {
+                    showToast(`${foundCount} archivo(s) encontrado(s)`, 'info');
+                }
+            }
+        }
+
+        // Calcular tamaño total de la papelera
+        function calculateTotalTrashSize() {
+            let totalMB = 0;
+            
+            trashFilesData.forEach(file => {
+                const sizeValue = parseFloat(file.size);
+                const unit = file.size.split(' ')[1];
+                
+                if (unit === 'GB') totalMB += sizeValue * 1024;
+                else if (unit === 'MB') totalMB += sizeValue;
+                else if (unit === 'KB') totalMB += sizeValue / 1024;
+            });
+            
+            if (totalMB >= 1024) {
+                return (totalMB / 1024).toFixed(1) + ' GB';
+            } else {
+                return totalMB.toFixed(1) + ' MB';
+            }
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const totalTrash = trashFilesData.length;
+            const pdfTrash = trashFilesData.filter(f => f.type === 'pdf').length;
+            const expiringSoon = trashFilesData.filter(f => f.status === 'expiring').length;
+            const spaceFreed = calculateTotalTrashSize();
+            
+            document.getElementById('totalTrash').textContent = totalTrash;
+            document.getElementById('pdfTrash').textContent = pdfTrash;
+            document.getElementById('expiringSoon').textContent = expiringSoon;
+            document.getElementById('spaceFreed').textContent = spaceFreed;
+        }
+
+        // Actualizar información de vaciado automático
+        function updateAutoCleanInfo() {
+            if (trashFilesData.length === 0) {
+                document.getElementById('autoCleanProgress').style.width = '0%';
+                document.getElementById('autoCleanTime').textContent = 'Papelera vacía';
+                return;
+            }
+            
+            // Calcular días mínimos restantes
+            const minDaysLeft = Math.min(...trashFilesData.map(f => f.daysLeft));
+            const maxDays = 30; // Retención máxima de 30 días
+            
+            let progress = 0;
+            let timeText = '';
+            
+            if (minDaysLeft <= 0) {
+                progress = 100;
+                timeText = 'Expirado';
+            } else {
+                progress = ((maxDays - minDaysLeft) / maxDays) * 100;
+                timeText = minDaysLeft === 1 ? 'Mañana' : `En ${minDaysLeft} días`;
+            }
+            
+            document.getElementById('autoCleanProgress').style.width = `${progress}%`;
+            document.getElementById('autoCleanTime').textContent = timeText;
+        }
+
+        // Cambiar vista (grid/lista)
+        function changeView(viewType) {
+            currentView = viewType;
+            loadTrashFiles();
+            showToast(`Vista ${viewType === 'grid' ? 'de cuadrícula' : 'de lista'} activada`, 'info');
+        }
+
+        // Mostrar notificación
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            
+            // Convertir saltos de línea a HTML
+            if (typeof message === 'string' && message.includes('<br>')) {
+                toast.innerHTML = message;
+            } else {
+                toast.textContent = message;
+            }
+            
+            const bgColor = type === 'success' ? '#4CAF50' : 
+                            type === 'error' ? '#F44336' : 
+                            type === 'warning' ? '#FF9800' : '#2196F3';
+            
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background-color: ${bgColor};
+                color: white;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+            `;
+            
+            if (!document.querySelector('style#toast-animation')) {
+                const style = document.createElement('style');
+                style.id = 'toast-animation';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes fadeOut {
+                        from { opacity: 1; }
+                        to { opacity: 0; }
+                    }
+                    .toast-notification {
+                        animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        // Mostrar modal de configuración
+        function showSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Login
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                const username = prompt('Ingresa tu nombre de usuario:');
+                if (username && username.trim()) {
+                    const newUsername = username.trim();
+                    document.getElementById('username').textContent = newUsername;
+                    saveUserToStorage(newUsername);
+                    showToast('¡Sesión iniciada!', 'success');
+                }
+            });
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                    document.getElementById('username').textContent = 'Invitado';
+                    saveUserToStorage('Invitado');
+                    showToast('Sesión cerrada correctamente', 'success');
+                }
+            });
+
+            // Botones de vista
+            const gridViewBtn = document.getElementById('gridViewBtn');
+            const listViewBtn = document.getElementById('listViewBtn');
+            
+            if (gridViewBtn && listViewBtn) {
+                gridViewBtn.addEventListener('click', () => {
+                    gridViewBtn.classList.add('active');
+                    listViewBtn.classList.remove('active');
+                    changeView('grid');
+                });
+                
+                listViewBtn.addEventListener('click', () => {
+                    listViewBtn.classList.add('active');
+                    gridViewBtn.classList.remove('active');
+                    changeView('list');
+                });
+            }
+            
+            // Filtros
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    filterTrashFiles(this.dataset.filter);
+                });
+            });
+            
+            // Restaurar todos
+            const restoreAllBtn = document.getElementById('restoreAllBtn');
+            if (restoreAllBtn) {
+                restoreAllBtn.addEventListener('click', restoreAllFiles);
+            }
+            
+            // Vaciar papelera
+            const emptyTrashBtn = document.getElementById('emptyTrashBtn');
+            if (emptyTrashBtn) {
+                emptyTrashBtn.addEventListener('click', showEmptyTrashModal);
+            }
+            
+            // Búsqueda
+            const searchInput = document.getElementById('searchInput');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value;
+                    
+                    if (clearSearchBtn) {
+                        clearSearchBtn.style.display = searchTerm ? 'block' : 'none';
+                    }
+                    
+                    searchTrashFiles(searchTerm);
+                });
+            }
+            
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    this.style.display = 'none';
+                    loadTrashFiles();
+                    searchInput.focus();
+                });
+            }
+            
+            // Modales de confirmación
+            const restoreModal = document.getElementById('restoreModal');
+            const closeRestoreModal = document.getElementById('closeRestoreModal');
+            const confirmRestoreBtn = document.getElementById('confirmRestoreBtn');
+            const cancelRestoreBtn = document.getElementById('cancelRestoreBtn');
+            
+            if (closeRestoreModal) {
+                closeRestoreModal.addEventListener('click', () => {
+                    restoreModal.classList.remove('active');
+                    currentFileToRestore = null;
+                });
+            }
+            
+            if (restoreModal) {
+                restoreModal.addEventListener('click', (e) => {
+                    if (e.target === restoreModal) {
+                        restoreModal.classList.remove('active');
+                        currentFileToRestore = null;
+                    }
+                });
+            }
+            
+            if (confirmRestoreBtn) {
+                confirmRestoreBtn.addEventListener('click', () => {
+                    if (currentFileToRestore) {
+                        restoreFile(currentFileToRestore);
+                    }
+                });
+            }
+            
+            if (cancelRestoreBtn) {
+                cancelRestoreBtn.addEventListener('click', () => {
+                    restoreModal.classList.remove('active');
+                    currentFileToRestore = null;
+                });
+            }
+            
+            // Modal de eliminación
+            const deleteModal = document.getElementById('deleteModal');
+            const closeDeleteModal = document.getElementById('closeDeleteModal');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            
+            if (closeDeleteModal) {
+                closeDeleteModal.addEventListener('click', () => {
+                    deleteModal.classList.remove('active');
+                    currentFileToDelete = null;
+                });
+            }
+            
+            if (deleteModal) {
+                deleteModal.addEventListener('click', (e) => {
+                    if (e.target === deleteModal) {
+                        deleteModal.classList.remove('active');
+                        currentFileToDelete = null;
+                    }
+                });
+            }
+            
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', () => {
+                    if (currentFileToDelete) {
+                        deleteFilePermanently(currentFileToDelete);
+                    }
+                });
+            }
+            
+            if (cancelDeleteBtn) {
+                cancelDeleteBtn.addEventListener('click', () => {
+                    deleteModal.classList.remove('active');
+                    currentFileToDelete = null;
+                });
+            }
+            
+            // Modal de vaciar papelera
+            const emptyTrashModal = document.getElementById('emptyTrashModal');
+            const closeEmptyTrashModal = document.getElementById('closeEmptyTrashModal');
+            const confirmEmptyTrashBtn = document.getElementById('confirmEmptyTrashBtn');
+            const cancelEmptyTrashBtn = document.getElementById('cancelEmptyTrashBtn');
+            
+            if (closeEmptyTrashModal) {
+                closeEmptyTrashModal.addEventListener('click', () => {
+                    emptyTrashModal.classList.remove('active');
+                });
+            }
+            
+            if (emptyTrashModal) {
+                emptyTrashModal.addEventListener('click', (e) => {
+                    if (e.target === emptyTrashModal) {
+                        emptyTrashModal.classList.remove('active');
+                    }
+                });
+            }
+            
+            if (confirmEmptyTrashBtn) {
+                confirmEmptyTrashBtn.addEventListener('click', emptyTrash);
+            }
+            
+            if (cancelEmptyTrashBtn) {
+                cancelEmptyTrashBtn.addEventListener('click', () => {
+                    emptyTrashModal.classList.remove('active');
+                });
+            }
+            
+            // Configuración modal
+            const settingsModal = document.getElementById('settingsModal');
+            const closeSettingsModal = document.getElementById('closeSettingsModal');
+            const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+            const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
+            
+            if (closeSettingsModal) {
+                closeSettingsModal.addEventListener('click', () => {
+                    settingsModal.classList.remove('active');
+                });
+            }
+            
+            if (settingsModal) {
+                settingsModal.addEventListener('click', (e) => {
+                    if (e.target === settingsModal) {
+                        settingsModal.classList.remove('active');
+                    }
+                });
+            }
+            
+            if (saveSettingsBtn) {
+                saveSettingsBtn.addEventListener('click', () => {
+                    settingsModal.classList.remove('active');
+                    showToast('Configuración guardada', 'success');
+                });
+            }
+            
+            if (cancelSettingsBtn) {
+                cancelSettingsBtn.addEventListener('click', () => {
+                    settingsModal.classList.remove('active');
+                });
+            }
+            
+            // Notificaciones
+            const notificationsBtn = document.getElementById('notificationsBtn');
+            const notificationCount = document.getElementById('notificationCount');
+            
+            if (notificationsBtn && notificationCount) {
+                notificationsBtn.addEventListener('click', () => {
+                    const currentCount = parseInt(notificationCount.textContent);
+                    if (currentCount > 0) {
+                        notificationCount.textContent = '0';
+                        notificationCount.style.display = 'none';
+                        showToast('Notificaciones marcadas como leídas', 'success');
+                    }
+                });
+            }
+            
+            // Limpiar todo
+            const resetBtn = document.getElementById('resetBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (confirm('¿Estás seguro de que quieres limpiar todos los datos? Esta acción no se puede deshacer.')) {
+                        trashFilesData.length = 0;
+                        selectedFiles = [];
+                        loadTrashFiles();
+                        updateStats();
+                        updateAutoCleanInfo();
+                        showToast('Todos los datos han sido limpiados', 'success');
+                    }
+                });
+            }
+        }
+
+        // Iniciar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

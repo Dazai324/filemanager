@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivos Compartidos - FileManager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #4a6cf7;
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .logo span {
+            color: #4a6cf7;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px 0;
+            background: #f9fafc;
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 15px;
+            background: #eef1ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar i {
+            font-size: 36px;
+            color: #4a6cf7;
+        }
+
+        .user-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .user-details p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .btn-login {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #3a5ce5;
+        }
+
+        .menu ul {
+            list-style: none;
+        }
+
+        .menu li {
+            margin-bottom: 5px;
+        }
+
+        .menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .menu li a:hover {
+            background: #f5f7ff;
+            color: #4a6cf7;
+        }
+
+        .menu li.active a {
+            background: #f5f7ff;
+            color: #4a6cf7;
+            font-weight: 500;
+        }
+
+        .menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .storage-info {
+            background: #f9fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .storage-header h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .storage-header span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .storage-bar {
+            height: 6px;
+            background: #eef1ff;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .storage-progress {
+            height: 100%;
+            background: #4a6cf7;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .storage-text {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .sidebar-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .sidebar-footer a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .sidebar-footer a:hover {
+            color: #4a6cf7;
+        }
+
+        .reset-btn {
+            color: #ff4757;
+        }
+
+        .reset-btn:hover {
+            color: #ff3742;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .clear-search:hover {
+            color: #ff4757;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-settings {
+            background: #f5f7ff;
+            color: #4a6cf7;
+            border: 1px solid #d6e0ff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-settings:hover {
+            background: #e1e9ff;
+        }
+
+        .btn-upload {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-upload:hover {
+            background: #3a5ce5;
+        }
+
+        .notifications {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .notifications i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            font-size: 11px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stats-section {
+            margin-bottom: 40px;
+        }
+
+        .stats-section h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .stat-icon i {
+            font-size: 24px;
+        }
+
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .files-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 22px;
+            color: #333;
+        }
+
+        .view-options {
+            display: flex;
+            gap: 5px;
+            background: #f5f7ff;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .view-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: #4a6cf7;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .shared-file-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            border: 2px solid transparent;
+            border-left: 4px solid #4a6cf7;
+        }
+
+        .shared-file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .shared-file-card.selected {
+            border-color: #4a6cf7;
+            background: #f9fbff;
+        }
+
+        .shared-file-card.shared-by-me {
+            border-left: 4px solid #10b981;
+        }
+
+        .shared-file-card.shared-with-me {
+            border-left: 4px solid #ff9500;
+        }
+
+        .file-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: #f0f4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .file-icon i {
+            font-size: 24px;
+            color: #4a6cf7;
+        }
+
+        .pdf .file-icon {
+            background: #ffeaea;
+        }
+
+        .pdf .file-icon i {
+            color: #f05050;
+        }
+
+        .doc .file-icon {
+            background: #eaf2ff;
+        }
+
+        .doc .file-icon i {
+            color: #4a6cf7;
+        }
+
+        .image .file-icon {
+            background: #fff5e6;
+        }
+
+        .image .file-icon i {
+            color: #ff9500;
+        }
+
+        .video .file-icon {
+            background: #f0f5ff;
+        }
+
+        .video .file-icon i {
+            color: #7e5bef;
+        }
+
+        .folder .file-icon {
+            background: #e6f7ed;
+        }
+
+        .folder .file-icon i {
+            color: #10b981;
+        }
+
+        .file-title {
+            flex: 1;
+        }
+
+        .file-title h4 {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-title p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .file-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .permission-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .permission-view {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .permission-edit {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .permission-full {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .share-type {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .file-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .file-action {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            color: #999;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .file-action:hover {
+            background: #f5f7ff;
+            color: #4a6cf7;
+        }
+
+        .shared-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .shared-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .shared-table thead {
+            background: #f9fafc;
+        }
+
+        .shared-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .shared-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        .shared-table tbody tr:hover {
+            background: #f9faff;
+        }
+
+        .table-file-cell {
+            display: flex;
+            align-items: center;
+        }
+
+        .table-file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .table-file-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .table-file-info p {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #ddd;
+            display: none;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #999;
+            margin-bottom: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .type-filters {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .filter-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .filter-tab.active {
+            background: #4a6cf7;
+            color: white;
+            border-color: #4a6cf7;
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: #f5f7ff;
+            border-color: #4a6cf7;
+        }
+
+        .favorite-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .favorite-count {
+            font-weight: 600;
+            color: #4a6cf7;
+        }
+
+        .btn-clear-favorites {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn-clear-favorites:hover {
+            background: #ff3742;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .share-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .share-area:hover {
+            border-color: #4a6cf7;
+            background: #f9faff;
+        }
+
+        .share-area i {
+            font-size: 48px;
+            color: #4a6cf7;
+            margin-bottom: 15px;
+        }
+
+        .share-area p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .share-subtext {
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .btn-select {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-select:hover {
+            background: #3a5ce5;
+        }
+
+        .share-progress {
+            text-align: center;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4a6cf7;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .share-success {
+            text-align: center;
+            display: none;
+        }
+
+        .share-success i {
+            font-size: 48px;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .share-success p {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+        }
+
+        .settings-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .settings-section h4 i {
+            color: #4a6cf7;
+        }
+
+        .settings-item {
+            margin-bottom: 15px;
+        }
+
+        .settings-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .settings-item input[type="text"],
+        .settings-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save, .btn-cancel, .btn-confirm {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: #4a6cf7;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #3a5ce5;
+        }
+
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+            }
+            
+            .search-bar {
+                max-width: 100%;
+            }
+            
+            .files-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .shared-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-actions {
+                flex-direction: column;
+            }
+            
+            .top-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-folder-open"></i>
+                <h1>File<span>Manager</span></h1>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="username">Invitado</h3>
+                    <p>No has iniciado sesión</p>
+                    <button class="btn-login" id="loginBtn">Iniciar Sesión</button>
+                </div>
+            </div>
+            
+            <nav class="menu">
+                <ul>
+                    <li><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-file"></i> Mis Archivos</a></li>
+                    <li class="active"><a href="#"><i class="fas fa-share-alt"></i> Compartidos</a></li>
+                    <li><a href="#"><i class="fas fa-history"></i> Recientes</a></li>
+                    <li><a href="#"><i class="fas fa-star"></i> Favoritos</a></li>
+                    <li><a href="#"><i class="fas fa-trash-alt"></i> Papelera</a></li>
+                </ul>
+                
+                <div class="storage-info">
+                    <div class="storage-header">
+                        <h4>Almacenamiento</h4>
+                        <span id="storageText">0 GB / 50 GB</span>
+                    </div>
+                    <div class="storage-bar">
+                        <div class="storage-progress" id="storageProgress"></div>
+                    </div>
+                    <p class="storage-text" id="storagePercent">0% utilizado</p>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" onclick="showSettingsModal()"><i class="fas fa-cog"></i> Configuración</a>
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+                <a href="#" id="resetBtn" class="reset-btn"><i class="fas fa-eraser"></i> Limpiar Todo</a>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar archivos compartidos...">
+                    <button class="clear-search" id="clearSearchBtn" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="top-actions">
+                    <button class="btn-settings" onclick="showSettingsModal()">
+                        <i class="fas fa-cog"></i> Configuración
+                    </button>
+                    <button class="btn-upload" id="shareBtn">
+                        <i class="fas fa-share-alt"></i> Compartir Archivo
+                    </button>
+                    <div class="notifications" id="notificationsBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count" id="notificationCount">0</span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-share-alt"></i>
+                <h3>No hay archivos compartidos</h3>
+                <p>Comparte archivos con otros usuarios para verlos aquí</p>
+                <button class="btn-upload" id="emptyShareBtn">
+                    <i class="fas fa-share-alt"></i>
+                    Compartir Primer Archivo
+                </button>
+            </div>
+            
+            <section class="stats-section" id="statsSection" style="display: none;">
+                <h2>Resumen de Compartición</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #e3f2fd;">
+                            <i class="fas fa-share-alt" style="color: #2196f3;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalShared">0</h3>
+                            <p>Archivos Compartidos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #e8f5e9;">
+                            <i class="fas fa-upload" style="color: #4caf50;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="sharedByMe">0</h3>
+                            <p>Compartidos por Mí</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #fff3e0;">
+                            <i class="fas fa-download" style="color: #ff9800;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="sharedWithMe">0</h3>
+                            <p>Compartidos conmigo</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #f3e5f5;">
+                            <i class="fas fa-users" style="color: #9c27b0;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Usuarios Involucrados</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="type-filters" id="shareFilters" style="display: none;">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">Todos</button>
+                    <button class="filter-tab" data-filter="by-me">Compartidos por Mí</button>
+                    <button class="filter-tab" data-filter="with-me">Compartidos conmigo</button>
+                    <button class="filter-tab" data-filter="pdf">PDF</button>
+                    <button class="filter-tab" data-filter="doc">Documentos</button>
+                    <button class="filter-tab" data-filter="image">Imágenes</button>
+                </div>
+                
+                <div class="favorite-info">
+                    <div class="favorite-count" id="activeShareCount">0 archivos</div>
+                    <button class="btn-clear-favorites" id="clearShareBtn">
+                        <i class="fas fa-trash-alt"></i> Limpiar Historial
+                    </button>
+                </div>
+            </div>
+            
+            <section class="files-section" id="filesSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Archivos Compartidos</h2>
+                    <div class="view-options">
+                        <button class="view-btn active" id="gridViewBtn">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="view-btn" id="listViewBtn">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="files-grid" id="sharedFilesContainer">
+                    <!-- Los archivos compartidos se cargarán aquí -->
+                </div>
+                
+                <div class="shared-table-container" id="sharedTableContainer" style="display: none;">
+                    <div class="table-header">
+                        <h3>Archivos Compartidos</h3>
+                    </div>
+                    <table class="shared-table">
+                        <thead>
+                            <tr>
+                                <th>Archivo</th>
+                                <th>Tamaño</th>
+                                <th>Compartido Por</th>
+                                <th>Permiso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sharedTableBody">
+                            <!-- Las filas se llenarán con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Compartir Archivo</h3>
+                <button class="close-modal" id="closeShareModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="share-area" id="shareArea">
+                    <i class="fas fa-share-alt"></i>
+                    <p>Selecciona un archivo para compartir</p>
+                    <p class="share-subtext">o</p>
+                    <button class="btn-select" id="selectFileBtn">Seleccionar Archivo</button>
+                    <input type="file" id="fileInput" style="display: none;">
+                </div>
+                <div class="share-progress" id="shareProgress">
+                    <p id="shareStatus">Compartiendo archivo...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                <div class="share-success" id="shareSuccess">
+                    <i class="fas fa-check-circle"></i>
+                    <p id="successMessage">¡Archivo compartido exitosamente!</p>
+                    <button class="btn-select" id="closeShareBtn">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configuración de Compartición</h3>
+                <button class="close-modal" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4><i class="fas fa-bell"></i> Notificaciones</h4>
+                    <div class="settings-item">
+                        <input type="checkbox" id="shareNotifications" checked>
+                        <label for="shareNotifications">Recibir notificaciones cuando compartan archivos conmigo</label>
+                    </div>
+                    <div class="settings-item">
+                        <input type="checkbox" id="downloadNotifications" checked>
+                        <label for="downloadNotifications">Notificarme cuando alguien descargue mis archivos</label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4><i class="fas fa-shield-alt"></i> Seguridad</h4>
+                    <div class="settings-item">
+                        <label for="linkExpiration">Expiración de enlaces:</label>
+                        <select id="linkExpiration">
+                            <option value="7">7 días</option>
+                            <option value="30" selected>30 días</option>
+                            <option value="90">90 días</option>
+                            <option value="never">Nunca</option>
+                        </select>
+                    </div>
+                    <div class="settings-item">
+                        <label for="defaultPermission">Permiso predeterminado:</label>
+                        <select id="defaultPermission">
+                            <option value="view">Solo ver</option>
+                            <option value="edit" selected>Editar</option>
+                            <option value="full">Control total</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="btn-save" id="saveSettingsBtn">Guardar Cambios</button>
+                    <button class="btn-cancel" id="cancelSettingsBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sharedFiles = JSON.parse(localStorage.getItem('sharedFiles')) || [
+            {
+                id: 1,
+                name: 'Informe Anual 2023.pdf',
+                type: 'pdf',
+                size: '4.2 MB',
+                sharedBy: 'Ana García',
+                sharedDate: '2023-10-15',
+                permission: 'view',
+                sharedType: 'with-me'
+            },
+            {
+                id: 2,
+                name: 'Diseño Web Final.zip',
+                type: 'folder',
+                size: '12.5 MB',
+                sharedBy: 'Carlos López',
+                sharedDate: '2023-10-10',
+                permission: 'full',
+                sharedType: 'with-me'
+            },
+            {
+                id: 3,
+                name: 'Presentación Marketing.pptx',
+                type: 'doc',
+                size: '8.7 MB',
+                sharedBy: 'Yo',
+                sharedDate: '2023-10-05',
+                permission: 'edit',
+                sharedType: 'by-me'
+            },
+            {
+                id: 4,
+                name: 'Foto Equipo.jpg',
+                type: 'image',
+                size: '2.1 MB',
+                sharedBy: 'María Rodríguez',
+                sharedDate: '2023-09-28',
+                permission: 'view',
+                sharedType: 'with-me'
+            },
+            {
+                id: 5,
+                name: 'Video Tutorial.mp4',
+                type: 'video',
+                size: '45.3 MB',
+                sharedBy: 'Yo',
+                sharedDate: '2023-09-20',
+                permission: 'full',
+                sharedType: 'by-me'
+            },
+            {
+                id: 6,
+                name: 'Contratos Clientes.docx',
+                type: 'doc',
+                size: '3.8 MB',
+                sharedBy: 'Yo',
+                sharedDate: '2023-09-15',
+                permission: 'edit',
+                sharedType: 'by-me'
+            }
+        ];
+
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || { name: 'Invitado', loggedIn: false };
+        let storageUsed = parseInt(localStorage.getItem('storageUsed')) || 0;
+        const storageLimit = 50;
+        let notifications = JSON.parse(localStorage.getItem('notifications')) || [
+            { id: 1, text: 'Ana García compartió un archivo contigo', time: 'Hace 2 días', read: false },
+            { id: 2, text: 'Tu archivo fue descargado 5 veces', time: 'Hace 1 semana', read: false }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initPage();
+            updateSharedFilesDisplay();
+            setupEventListeners();
+        });
+
+        function initPage() {
+            if (currentUser.loggedIn) {
+                document.getElementById('username').textContent = currentUser.name;
+                document.getElementById('loginBtn').textContent = 'Mi Cuenta';
+            }
+
+            updateStorageBar();
+            updateNotificationCount();
+            updateStatistics();
+
+            if (sharedFiles.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('filesSection').style.display = 'none';
+                document.getElementById('statsSection').style.display = 'none';
+                document.getElementById('shareFilters').style.display = 'none';
+            } else {
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('filesSection').style.display = 'block';
+                document.getElementById('statsSection').style.display = 'block';
+                document.getElementById('shareFilters').style.display = 'block';
+            }
+        }
+
+        function updateStorageBar() {
+            const progress = (storageUsed / storageLimit) * 100;
+            document.getElementById('storageProgress').style.width = progress + '%';
+            document.getElementById('storageText').textContent = storageUsed + ' GB / ' + storageLimit + ' GB';
+            document.getElementById('storagePercent').textContent = Math.round(progress) + '% utilizado';
+        }
+
+        function updateNotificationCount() {
+            const unreadCount = notifications.filter(n => !n.read).length;
+            document.getElementById('notificationCount').textContent = unreadCount;
+        }
+
+        function updateStatistics() {
+            const totalShared = sharedFiles.length;
+            const sharedByMe = sharedFiles.filter(file => file.sharedType === 'by-me').length;
+            const sharedWithMe = sharedFiles.filter(file => file.sharedType === 'with-me').length;
+            const uniqueUsers = [...new Set(sharedFiles.map(file => file.sharedBy))].length;
+
+            document.getElementById('totalShared').textContent = totalShared;
+            document.getElementById('sharedByMe').textContent = sharedByMe;
+            document.getElementById('sharedWithMe').textContent = sharedWithMe;
+            document.getElementById('totalUsers').textContent = uniqueUsers;
+            document.getElementById('activeShareCount').textContent = totalShared + ' archivos';
+        }
+
+        function updateSharedFilesDisplay() {
+            const container = document.getElementById('sharedFilesContainer');
+            const tableBody = document.getElementById('sharedTableBody');
+            container.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            sharedFiles.forEach(file => {
+                const fileCard = createFileCard(file);
+                container.appendChild(fileCard);
+
+                const tableRow = createTableRow(file);
+                tableBody.appendChild(tableRow);
+            });
+        }
+
+        function createFileCard(file) {
+            const card = document.createElement('div');
+            card.className = `shared-file-card ${file.type} ${file.sharedType === 'by-me' ? 'shared-by-me' : 'shared-with-me'}`;
+            card.dataset.id = file.id;
+
+            const fileIcon = getFileIcon(file.type);
+            const permissionText = getPermissionText(file.permission);
+            const permissionClass = getPermissionClass(file.permission);
+            const shareTypeText = file.sharedType === 'by-me' ? 'Compartido por mí' : 'Compartido conmigo';
+
+            card.innerHTML = `
+                <div class="file-header">
+                    <div class="file-icon">
+                        <i class="${fileIcon}"></i>
+                    </div>
+                    <div class="file-title">
+                        <h4>${file.name}</h4>
+                        <p>${file.sharedBy} • ${formatDate(file.sharedDate)}</p>
+                    </div>
+                </div>
+                <div class="file-details">
+                    <span class="permission-badge ${permissionClass}">${permissionText}</span>
+                    <span class="share-type">${shareTypeText}</span>
+                </div>
+                <div class="file-actions">
+                    <button class="file-action" onclick="downloadFile(${file.id})" title="Descargar">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="file-action" onclick="shareFile(${file.id})" title="Compartir">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <button class="file-action" onclick="toggleFavorite(${file.id})" title="Favorito">
+                        <i class="far fa-star"></i>
+                    </button>
+                    <button class="file-action" onclick="deleteSharedFile(${file.id})" title="Eliminar">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function createTableRow(file) {
+            const row = document.createElement('tr');
+            row.dataset.id = file.id;
+
+            const fileIcon = getFileIcon(file.type);
+            const permissionText = getPermissionText(file.permission);
+
+            row.innerHTML = `
+                <td>
+                    <div class="table-file-cell">
+                        <div class="table-file-icon ${file.type}">
+                            <i class="${fileIcon}"></i>
+                        </div>
+                        <div class="table-file-info">
+                            <h4>${file.name}</h4>
+                            <p>Compartido: ${formatDate(file.sharedDate)}</p>
+                        </div>
+                    </div>
+                </td>
+                <td>${file.size}</td>
+                <td>${file.sharedBy}</td>
+                <td><span class="permission-badge ${getPermissionClass(file.permission)}">${permissionText}</span></td>
+                <td>
+                    <div class="table-actions">
+                        <button class="file-action" onclick="downloadFile(${file.id})" title="Descargar">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="file-action" onclick="shareFile(${file.id})" title="Compartir">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <button class="file-action" onclick="deleteSharedFile(${file.id})" title="Eliminar">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            return row;
+        }
+
+        function getFileIcon(type) {
+            const icons = {
+                'pdf': 'fas fa-file-pdf',
+                'doc': 'fas fa-file-word',
+                'image': 'fas fa-file-image',
+                'video': 'fas fa-file-video',
+                'folder': 'fas fa-folder'
+            };
+            return icons[type] || 'fas fa-file';
+        }
+
+        function getPermissionText(permission) {
+            const texts = {
+                'view': 'Solo ver',
+                'edit': 'Editar',
+                'full': 'Control total'
+            };
+            return texts[permission] || 'Desconocido';
+        }
+
+        function getPermissionClass(permission) {
+            const classes = {
+                'view': 'permission-view',
+                'edit': 'permission-edit',
+                'full': 'permission-full'
+            };
+            return classes[permission] || '';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric' 
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('gridViewBtn').addEventListener('click', () => {
+                document.getElementById('gridViewBtn').classList.add('active');
+                document.getElementById('listViewBtn').classList.remove('active');
+                document.getElementById('sharedFilesContainer').style.display = 'grid';
+                document.getElementById('sharedTableContainer').style.display = 'none';
+            });
+
+            document.getElementById('listViewBtn').addEventListener('click', () => {
+                document.getElementById('listViewBtn').classList.add('active');
+                document.getElementById('gridViewBtn').classList.remove('active');
+                document.getElementById('sharedFilesContainer').style.display = 'none';
+                document.getElementById('sharedTableContainer').style.display = 'block';
+            });
+
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                document.getElementById('clearSearchBtn').style.display = searchTerm ? 'block' : 'none';
+                filterSharedFiles(searchTerm);
+            });
+
+            document.getElementById('clearSearchBtn').addEventListener('click', function() {
+                document.getElementById('searchInput').value = '';
+                this.style.display = 'none';
+                filterSharedFiles('');
+            });
+
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    filterByType(this.dataset.filter);
+                });
+            });
+
+            document.getElementById('shareBtn').addEventListener('click', showShareModal);
+            document.getElementById('emptyShareBtn').addEventListener('click', showShareModal);
+
+            document.getElementById('closeShareModal').addEventListener('click', closeShareModal);
+            document.getElementById('selectFileBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+            document.getElementById('closeShareBtn').addEventListener('click', closeShareModal);
+
+            document.getElementById('closeSettingsModal').addEventListener('click', closeSettingsModal);
+            document.getElementById('cancelSettingsBtn').addEventListener('click', closeSettingsModal);
+            document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+
+            document.getElementById('loginBtn').addEventListener('click', toggleLogin);
+            document.getElementById('notificationsBtn').addEventListener('click', showNotifications);
+            document.getElementById('clearShareBtn').addEventListener('click', clearSharedHistory);
+            document.getElementById('resetBtn').addEventListener('click', resetData);
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+        }
+
+        function filterSharedFiles(searchTerm) {
+            const cards = document.querySelectorAll('.shared-file-card');
+            const rows = document.querySelectorAll('#sharedTableBody tr');
+            let visibleCount = 0;
+
+            cards.forEach((card, index) => {
+                const fileName = card.querySelector('h4').textContent.toLowerCase();
+                const sharedBy = card.querySelector('.file-title p').textContent.toLowerCase();
+                const isVisible = fileName.includes(searchTerm) || sharedBy.includes(searchTerm);
+                
+                card.style.display = isVisible ? 'block' : 'none';
+                if (rows[index]) rows[index].style.display = isVisible ? 'table-row' : 'none';
+                
+                if (isVisible) visibleCount++;
+            });
+
+            if (visibleCount === 0 && searchTerm) {
+                showEmptySearchState();
+            } else {
+                hideEmptySearchState();
+            }
+        }
+
+        function filterByType(filter) {
+            const cards = document.querySelectorAll('.shared-file-card');
+            const rows = document.querySelectorAll('#sharedTableBody tr');
+            let visibleCount = 0;
+
+            cards.forEach((card, index) => {
+                const fileType = card.classList.contains(filter);
+                const sharedType = card.classList.contains(filter === 'by-me' ? 'shared-by-me' : 
+                                                          filter === 'with-me' ? 'shared-with-me' : false);
+                const isVisible = filter === 'all' || fileType || sharedType;
+                
+                card.style.display = isVisible ? 'block' : 'none';
+                if (rows[index]) rows[index].style.display = isVisible ? 'table-row' : 'none';
+                
+                if (isVisible) visibleCount++;
+            });
+
+            document.getElementById('activeShareCount').textContent = visibleCount + ' archivos';
+        }
+
+        function showEmptySearchState() {
+            const container = document.getElementById('sharedFilesContainer');
+            const emptySearchHTML = `
+                <div class="empty-search" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                    <i class="fas fa-search" style="font-size: 48px; color: #ddd;"></i>
+                    <h3>No se encontraron resultados</h3>
+                    <p>Intenta con otros términos de búsqueda</p>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', emptySearchHTML);
+        }
+
+        function hideEmptySearchState() {
+            const emptySearch = document.querySelector('.empty-search');
+            if (emptySearch) emptySearch.remove();
+        }
+
+        function showShareModal() {
+            document.getElementById('shareModal').classList.add('active');
+            resetShareModal();
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+            resetShareModal();
+        }
+
+        function resetShareModal() {
+            document.getElementById('shareArea').style.display = 'block';
+            document.getElementById('shareProgress').style.display = 'none';
+            document.getElementById('shareSuccess').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('progressFill').style.width = '0%';
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('shareArea').style.display = 'none';
+            document.getElementById('shareProgress').style.display = 'block';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                document.getElementById('progressFill').style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    setTimeout(() => {
+                        document.getElementById('shareProgress').style.display = 'none';
+                        document.getElementById('shareSuccess').style.display = 'block';
+                        
+                        addNewSharedFile(file);
+                    }, 500);
+                }
+            }, 200);
+        }
+
+        function addNewSharedFile(file) {
+            const newFile = {
+                id: sharedFiles.length + 1,
+                name: file.name,
+                type: getFileTypeFromName(file.name),
+                size: formatFileSize(file.size),
+                sharedBy: 'Yo',
+                sharedDate: new Date().toISOString().split('T')[0],
+                permission: document.getElementById('defaultPermission').value || 'edit',
+                sharedType: 'by-me'
+            };
+
+            sharedFiles.unshift(newFile);
+            saveSharedFiles();
+            updateSharedFilesDisplay();
+            updateStatistics();
+            
+            if (sharedFiles.length === 1) {
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('filesSection').style.display = 'block';
+                document.getElementById('statsSection').style.display = 'block';
+                document.getElementById('shareFilters').style.display = 'block';
+            }
+        }
+
+        function getFileTypeFromName(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (['pdf'].includes(ext)) return 'pdf';
+            if (['doc', 'docx', 'txt', 'rtf'].includes(ext)) return 'doc';
+            if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(ext)) return 'image';
+            if (['mp4', 'avi', 'mov', 'wmv'].includes(ext)) return 'video';
+            if (['zip', 'rar', '7z'].includes(ext)) return 'folder';
+            return 'doc';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function downloadFile(id) {
+            const file = sharedFiles.find(f => f.id === id);
+            if (!file) return;
+
+            alert(`Descargando "${file.name}"...`);
+            
+            if (file.sharedType === 'by-me') {
+                addNotification(`Alguien descargó tu archivo "${file.name}"`);
+            }
+        }
+
+        function shareFile(id) {
+            const file = sharedFiles.find(f => f.id === id);
+            if (!file) return;
+
+            const shareUrl = `https://filemanager.com/share/${id}`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert(`Enlace de "${file.name}" copiado al portapapeles`);
+                addNotification(`Compartiste "${file.name}"`);
+            });
+        }
+
+        function deleteSharedFile(id) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este archivo compartido?')) return;
+
+            sharedFiles = sharedFiles.filter(f => f.id !== id);
+            saveSharedFiles();
+            updateSharedFilesDisplay();
+            updateStatistics();
+            
+            if (sharedFiles.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('filesSection').style.display = 'none';
+                document.getElementById('statsSection').style.display = 'none';
+                document.getElementById('shareFilters').style.display = 'none';
+            }
+        }
+
+        function toggleFavorite(id) {
+            const file = sharedFiles.find(f => f.id === id);
+            if (file) {
+                alert(`"${file.name}" añadido a favoritos`);
+            }
+        }
+
+        function showSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+            
+            const settings = JSON.parse(localStorage.getItem('shareSettings')) || {};
+            if (settings.linkExpiration) {
+                document.getElementById('linkExpiration').value = settings.linkExpiration;
+            }
+            if (settings.defaultPermission) {
+                document.getElementById('defaultPermission').value = settings.defaultPermission;
+            }
+            if (settings.shareNotifications !== undefined) {
+                document.getElementById('shareNotifications').checked = settings.shareNotifications;
+            }
+            if (settings.downloadNotifications !== undefined) {
+                document.getElementById('downloadNotifications').checked = settings.downloadNotifications;
+            }
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function saveSettings() {
+            const settings = {
+                linkExpiration: document.getElementById('linkExpiration').value,
+                defaultPermission: document.getElementById('defaultPermission').value,
+                shareNotifications: document.getElementById('shareNotifications').checked,
+                downloadNotifications: document.getElementById('downloadNotifications').checked
+            };
+
+            localStorage.setItem('shareSettings', JSON.stringify(settings));
+            alert('Configuración guardada correctamente');
+            closeSettingsModal();
+        }
+
+        function toggleLogin() {
+            if (currentUser.loggedIn) {
+                alert(`Bienvenido ${currentUser.name}`);
+            } else {
+                const name = prompt('Ingresa tu nombre:');
+                if (name) {
+                    currentUser = { name: name, loggedIn: true };
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    document.getElementById('username').textContent = name;
+                    document.getElementById('loginBtn').textContent = 'Mi Cuenta';
+                    alert(`¡Bienvenido, ${name}!`);
+                }
+            }
+        }
+
+        function logout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                currentUser = { name: 'Invitado', loggedIn: false };
+                localStorage.removeItem('currentUser');
+                document.getElementById('username').textContent = 'Invitado';
+                document.getElementById('loginBtn').textContent = 'Iniciar Sesión';
+            }
+        }
+
+        function showNotifications() {
+            notifications.forEach(n => n.read = true);
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+            updateNotificationCount();
+            
+            let notificationText = 'Notificaciones:\n\n';
+            notifications.forEach(n => {
+                notificationText += `• ${n.text} (${n.time})\n`;
+            });
+            alert(notificationText || 'No hay notificaciones');
+        }
+
+        function addNotification(text) {
+            const newNotification = {
+                id: notifications.length + 1,
+                text: text,
+                time: 'Ahora',
+                read: false
+            };
+            
+            notifications.unshift(newNotification);
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+            updateNotificationCount();
+        }
+
+        function clearSharedHistory() {
+            if (!confirm('¿Estás seguro de que quieres eliminar todo el historial de archivos compartidos?')) return;
+            
+            sharedFiles = [];
+            saveSharedFiles();
+            updateSharedFilesDisplay();
+            updateStatistics();
+            
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('filesSection').style.display = 'none';
+            document.getElementById('statsSection').style.display = 'none';
+            document.getElementById('shareFilters').style.display = 'none';
+        }
+
+        function resetData() {
+            if (confirm('¿Estás seguro de que quieres resetear todos los datos? Esto eliminará todos tus archivos compartidos.')) {
+                localStorage.clear();
+                sharedFiles = [];
+                currentUser = { name: 'Invitado', loggedIn: false };
+                notifications = [];
+                storageUsed = 0;
+                
+                initPage();
+                updateSharedFilesDisplay();
+                alert('Datos reseteados correctamente');
+            }
+        }
+
+        function saveSharedFiles() {
+            localStorage.setItem('sharedFiles', JSON.stringify(sharedFiles));
+        }
+    </script>
+</body>
+</html>

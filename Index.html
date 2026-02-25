@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Manager Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/folder-invoices.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #4a6cf7;
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .logo span {
+            color: #4a6cf7;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px 0;
+            background: #f9fafc;
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 15px;
+            background: #eef1ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar i {
+            font-size: 36px;
+            color: #4a6cf7;
+        }
+
+        .user-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .user-details p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .btn-login {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #3a5ce5;
+        }
+
+        .menu ul {
+            list-style: none;
+        }
+
+        .menu li {
+            margin-bottom: 5px;
+        }
+
+        .menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: #555;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .menu li a:hover {
+            background: #f5f7ff;
+            color: #4a6cf7;
+        }
+
+        .menu li.active a {
+            background: #f5f7ff;
+            color: #4a6cf7;
+            font-weight: 500;
+        }
+
+        .menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .storage-info {
+            background: #f9fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .storage-header h4 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .storage-header span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .storage-bar {
+            height: 6px;
+            background: #eef1ff;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .storage-progress {
+            height: 100%;
+            background: #4a6cf7;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .storage-text {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .sidebar-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .sidebar-footer a i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .sidebar-footer a:hover {
+            color: #4a6cf7;
+        }
+
+        .reset-btn {
+            color: #ff4757;
+        }
+
+        .reset-btn:hover {
+            color: #ff3742;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .clear-search:hover {
+            color: #ff4757;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-upload {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-upload:hover {
+            background: #3a5ce5;
+        }
+
+        .notifications {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .notifications i {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            font-size: 11px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stats-section {
+            margin-bottom: 40px;
+        }
+
+        .stats-section h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .stat-icon i {
+            font-size: 24px;
+        }
+
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .files-section {
+            margin-bottom: 40px;
+        }
+
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .file-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .file-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .file-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: #f0f4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        .file-icon i {
+            font-size: 28px;
+            color: #4a6cf7;
+        }
+
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .activity-section {
+            margin-bottom: 40px;
+        }
+
+        .activity-section h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .empty-activity {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #ddd;
+        }
+
+        .empty-activity i {
+            font-size: 64px;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .empty-activity p {
+            color: #999;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalAppear 0.3s ease;
+        }
+
+        @keyframes modalAppear {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #4a6cf7;
+            background: #f9faff;
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: #4a6cf7;
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .btn-select {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-select:hover {
+            background: #3a5ce5;
+        }
+
+        .upload-progress {
+            text-align: center;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4a6cf7;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .upload-success {
+            text-align: center;
+            display: none;
+        }
+
+        .upload-success i {
+            font-size: 48px;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+        }
+
+        .settings-section h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .settings-section h4 i {
+            color: #4a6cf7;
+        }
+
+        .settings-item {
+            margin-bottom: 15px;
+        }
+
+        .settings-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .settings-item input[type="text"],
+        .settings-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .settings-item input[type="range"] {
+            width: 100%;
+        }
+
+        #storageLimitValue {
+            display: inline-block;
+            margin-left: 10px;
+            color: #4a6cf7;
+            font-weight: 500;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save, .btn-cancel, .btn-confirm {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: #4a6cf7;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #3a5ce5;
+        }
+
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-confirm {
+            background: #ff4757;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #ff3742;
+        }
+
+        .confirm-icon {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .confirm-icon i {
+            font-size: 60px;
+            color: #ff9800;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+            }
+            
+            .search-bar {
+                max-width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .files-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .files-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-actions,
+            .confirm-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-folder-open"></i>
+                <h1>File<span>Manager</span></h1>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <h3 id="username">Invitado</h3>
+                    <p>No has iniciado sesión</p>
+                    <button class="btn-login" id="loginBtn">Iniciar Sesión</button>
+                </div>
+            </div>
+            
+            <nav class="menu">
+                <ul>
+                    <li class="active"><a href="#" onclick="changeSection('dashboard')"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="mis archivos.html" onclick="changeSection('archivos')"><i class="fas fa-file"></i> Mis Archivos</a></li>
+                    <li><a href="compartidos.html" onclick="changeSection('compartidos')"><i class="fas fa-share-alt"></i> Compartidos</a></li>
+                    <li><a href="recientes.html" onclick="changeSection('recientes')"><i class="fas fa-history"></i> Recientes</a></li>
+                    <li><a href="favoritos.html" onclick="changeSection('favoritos')"><i class="fas fa-star"></i> Favoritos</a></li>
+                    <li><a href="papelera.html" onclick="changeSection('papelera')"><i class="fas fa-trash-alt"></i> Papelera</a></li>
+                </ul>
+                
+                <div class="storage-info">
+                    <div class="storage-header">
+                        <h4>Almacenamiento</h4>
+                        <span id="storageText">0 GB / 50 GB</span>
+                    </div>
+                    <div class="storage-bar">
+                        <div class="storage-progress" id="storageProgress"></div>
+                    </div>
+                    <p class="storage-text" id="storagePercent">0% utilizado</p>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#" onclick="showSettingsModal()"><i class="fas fa-cog"></i> Configuración</a>
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+                <a href="#" id="resetBtn" class="reset-btn"><i class="fas fa-eraser"></i> Limpiar Todo</a>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar archivos...">
+                    <button class="clear-search" id="clearSearchBtn" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="top-actions">
+                    <button class="btn-upload" id="uploadBtn">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Subir Archivo
+                    </button>
+                    <div class="notifications" id="notificationsBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count" id="notificationCount">0</span>
+                    </div>
+                </div>
+            </header>
+            
+            <section class="stats-section">
+                <h2>Resumen de Archivos</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #e3f2fd;">
+                            <i class="fas fa-file" style="color: #2196f3;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalFiles">0</h3>
+                            <p>Archivos Totales</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #e8f5e9;">
+                            <i class="fas fa-folder" style="color: #4caf50;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalFolders">0</h3>
+                            <p>Carpetas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #fff3e0;">
+                            <i class="fas fa-share-alt" style="color: #ff9800;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalShared">0</h3>
+                            <p>Compartidos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #f3e5f5;">
+                            <i class="fas fa-download" style="color: #9c27b0;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalDownloads">0 GB</h3>
+                            <p>Descargados</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="files-section">
+                <div class="files-grid" id="filesContainer" style="display: none;">
+                    <!-- Los archivos se cargarán aquí con JavaScript -->
+                </div>
+            </section>
+            
+            <section class="activity-section">
+                <h2>Actividad Reciente</h2>
+                <div class="empty-activity" id="emptyActivityState">
+                    <i class="fas fa-history"></i>
+                    <p>No hay actividad reciente</p>
+                </div>
+                <div class="activity-list" id="activityList" style="display: none;">
+                    <!-- La actividad se cargará aquí con JavaScript -->
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal para subir archivos -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Subir Archivos</h3>
+                <button class="close-modal" id="closeUploadModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arrastra y suelta tus archivos aquí</p>
+                    <p class="upload-subtext">o</p>
+                    <button class="btn-select" id="selectFilesBtn">Seleccionar Archivos</button>
+                    <input type="file" id="fileInput" multiple style="display: none;">
+                </div>
+                <div class="upload-progress" id="uploadProgress">
+                    <p id="uploadStatus">Subiendo archivos...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                <div class="upload-success" id="uploadSuccess">
+                    <i class="fas fa-check-circle"></i>
+                    <p id="successMessage">¡Archivo subido exitosamente!</p>
+                    <button class="btn-select" id="closeUploadBtn">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de configuración -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configuración</h3>
+                <button class="close-modal" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4><i class="fas fa-user"></i> Perfil de Usuario</h4>
+                    <div class="settings-item">
+                        <label for="usernameInput">Nombre de usuario:</label>
+                        <input type="text" id="usernameInput" value="Invitado">
+                    </div>
+                    <div class="settings-item">
+                        <label for="storageLimit">Límite de almacenamiento (GB):</label>
+                        <input type="range" id="storageLimit" min="10" max="100" value="50">
+                        <span id="storageLimitValue">50 GB</span>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4><i class="fas fa-bell"></i> Notificaciones</h4>
+                    <div class="settings-item">
+                        <input type="checkbox" id="notificationsToggle" checked>
+                        <label for="notificationsToggle">Recibir notificaciones</label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4><i class="fas fa-paint-brush"></i> Apariencia</h4>
+                    <div class="settings-item">
+                        <label for="themeSelect">Tema:</label>
+                        <select id="themeSelect">
+                            <option value="light">Claro</option>
+                            <option value="dark">Oscuro</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="settings-actions">
+                    <button class="btn-save" id="saveSettingsBtn">Guardar Cambios</button>
+                    <button class="btn-cancel" id="cancelSettingsBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de confirmación -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar acción</h3>
+                <button class="close-modal" id="closeConfirmModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <p id="confirmMessage">¿Estás seguro de que quieres limpiar todos los datos? Esta acción no se puede deshacer.</p>
+                <div class="confirm-actions">
+                    <button class="btn-confirm" id="confirmYesBtn">Sí, limpiar todo</button>
+                    <button class="btn-cancel" id="confirmNoBtn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let files = [];
+        let activities = [];
+        let currentSection = 'dashboard';
+        let isLoggedIn = false;
+
+        function initApp() {
+            updateEmptyStates();
+            setupEventListeners();
+        }
+
+        function updateEmptyStates() {
+            const hasFiles = files.length > 0;
+            const hasActivities = activities.length > 0;
+            
+            // Archivos
+            document.getElementById('filesContainer').style.display = hasFiles ? 'grid' : 'none';
+            
+            // Actividad
+            document.getElementById('emptyActivityState').style.display = hasActivities ? 'none' : 'block';
+            document.getElementById('activityList').style.display = hasActivities ? 'block' : 'none';
+            
+            if (hasFiles) {
+                loadFiles();
+            }
+            
+            if (hasActivities) {
+                loadActivities();
+            }
+            
+            updateStats();
+            updateStorage();
+        }
+
+        function loadFiles() {
+            const container = document.getElementById('filesContainer');
+            container.innerHTML = '';
+            
+            files.forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'file-card';
+                card.innerHTML = `
+                    <div class="file-icon" style="background-color: ${file.color}20;">
+                        <i class="fas ${file.icon}" style="color: ${file.color};"></i>
+                    </div>
+                    <h4 class="file-name">${file.name}.${file.type}</h4>
+                    <div class="file-info">
+                        <div>${file.size} MB</div>
+                        <div>${file.date}</div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    showToast(`Archivo: ${file.name}.${file.type}\nTamaño: ${file.size} MB\nFecha: ${file.date}`, 'info');
+                });
+                
+                container.appendChild(card);
+            });
+        }
+
+        function loadActivities() {
+            const container = document.getElementById('activityList');
+            container.innerHTML = '';
+            
+            activities.forEach(activity => {
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                
+                let actionText = '';
+                switch(activity.type) {
+                    case 'upload': actionText = 'fue subido'; break;
+                    case 'share': actionText = 'fue compartido'; break;
+                    case 'edit': actionText = 'fue modificado'; break;
+                    default: actionText = 'fue actualizado';
+                }
+                
+                item.innerHTML = `
+                    <div class="activity-icon">
+                        <i class="fas ${activity.icon}" style="color: ${activity.color};"></i>
+                    </div>
+                    <div class="activity-details">
+                        <p><strong>${activity.file}</strong> ${actionText}</p>
+                        <span class="activity-time">${activity.time}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('totalFiles').textContent = files.length;
+            document.getElementById('totalFolders').textContent = '0';
+            document.getElementById('totalShared').textContent = '0';
+            document.getElementById('totalDownloads').textContent = '0 GB';
+        }
+
+        function updateStorage() {
+            const totalSize = files.reduce((total, file) => {
+                return total + parseFloat(file.size);
+            }, 0);
+            
+            const percent = Math.min((totalSize / 50) * 100, 100);
+            const usedGB = (totalSize / 1000).toFixed(2);
+            
+            document.getElementById('storageProgress').style.width = `${percent}%`;
+            document.getElementById('storageText').textContent = `${usedGB} GB / 50 GB`;
+            document.getElementById('storagePercent').textContent = `${percent.toFixed(1)}% utilizado`;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.textContent = message;
+            
+            const bgColor = type === 'success' ? '#4CAF50' : 
+                            type === 'error' ? '#F44336' : 
+                            type === 'warning' ? '#FF9800' : '#2196F3';
+            
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background-color: ${bgColor};
+                color: white;
+                border-radius: 8px;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+                word-break: break-word;
+            `;
+            
+            if (!document.querySelector('style#toast-animation')) {
+                const style = document.createElement('style');
+                style.id = 'toast-animation';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes fadeOut {
+                        from { opacity: 1; }
+                        to { opacity: 0; }
+                    }
+                    .toast-notification {
+                        animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        function changeSection(section) {
+            currentSection = section;
+            const menuItems = document.querySelectorAll('.menu li');
+            menuItems.forEach(item => item.classList.remove('active'));
+            
+            const sections = ['dashboard', 'archivos', 'compartidos', 'recientes', 'favoritos', 'papelera'];
+            const index = sections.indexOf(section);
+            if (index !== -1) {
+                menuItems[index].classList.add('active');
+            }
+        }
+
+        function simulateUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadSuccess = document.getElementById('uploadSuccess');
+            const progressFill = document.getElementById('progressFill');
+            
+            uploadArea.style.display = 'none';
+            uploadProgress.style.display = 'block';
+            progressFill.style.width = '0%';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                progressFill.style.width = `${Math.min(progress, 100)}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    setTimeout(() => {
+                        uploadProgress.style.display = 'none';
+                        uploadSuccess.style.display = 'block';
+                        
+                        const newId = files.length + 1;
+                        const fileTypes = [
+                            { type: "pdf", icon: "fa-file-pdf", color: "#FF6B6B" },
+                            { type: "doc", icon: "fa-file-word", color: "#42A5F5" },
+                            { type: "xls", icon: "fa-file-excel", color: "#66BB6A" },
+                            { type: "jpg", icon: "fa-file-image", color: "#AB47BC" }
+                        ];
+                        
+                        const fileType = fileTypes[Math.floor(Math.random() * fileTypes.length)];
+                        const newFile = {
+                            id: newId,
+                            name: `Archivo_${newId}`,
+                            type: fileType.type,
+                            size: (Math.random() * 5 + 1).toFixed(1),
+                            date: "Hoy",
+                            icon: fileType.icon,
+                            color: fileType.color
+                        };
+                        
+                        files.unshift(newFile);
+                        
+                        const newActivity = {
+                            id: activities.length + 1,
+                            type: "upload",
+                            file: `${newFile.name}.${newFile.type}`,
+                            time: "Hace unos momentos",
+                            icon: "fa-upload",
+                            color: "#4caf50"
+                        };
+                        
+                        activities.unshift(newActivity);
+                        
+                        updateEmptyStates();
+                        showToast(`Archivo "${newFile.name}.${newFile.type}" subido correctamente`, 'success');
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        function resetUploadModal() {
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadSuccess = document.getElementById('uploadSuccess');
+            const fileInput = document.getElementById('fileInput');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (uploadArea) uploadArea.style.display = 'block';
+            if (uploadProgress) uploadProgress.style.display = 'none';
+            if (uploadSuccess) uploadSuccess.style.display = 'none';
+            if (fileInput) fileInput.value = '';
+            if (progressFill) progressFill.style.width = '0%';
+        }
+
+        function setupEventListeners() {
+            // Login
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                const username = prompt('Ingresa tu nombre de usuario:');
+                if (username && username.trim()) {
+                    document.getElementById('username').textContent = username.trim();
+                    document.getElementById('usernameInput').value = username.trim();
+                    showToast('¡Sesión iniciada!', 'success');
+                }
+            });
+
+            // Upload modal
+            document.getElementById('uploadBtn').addEventListener('click', () => {
+                document.getElementById('uploadModal').classList.add('active');
+                resetUploadModal();
+            });
+
+            document.getElementById('closeUploadModal').addEventListener('click', () => {
+                document.getElementById('uploadModal').classList.remove('active');
+            });
+
+            document.getElementById('uploadModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('uploadModal')) {
+                    document.getElementById('uploadModal').classList.remove('active');
+                }
+            });
+
+            document.getElementById('selectFilesBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+
+            document.getElementById('fileInput').addEventListener('change', () => {
+                if (document.getElementById('fileInput').files.length > 0) {
+                    simulateUpload();
+                }
+            });
+
+            document.getElementById('closeUploadBtn').addEventListener('click', () => {
+                document.getElementById('uploadModal').classList.remove('active');
+                resetUploadModal();
+            });
+
+            // Drag and drop
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#4a6cf7';
+                uploadArea.style.backgroundColor = '#f9faff';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#ddd';
+                uploadArea.style.backgroundColor = 'white';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#ddd';
+                uploadArea.style.backgroundColor = 'white';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    simulateUpload();
+                }
+            });
+
+            // Reset
+            document.getElementById('resetBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('confirmModal').classList.add('active');
+            });
+
+            document.getElementById('closeConfirmModal').addEventListener('click', () => {
+                document.getElementById('confirmModal').classList.remove('active');
+            });
+
+            document.getElementById('confirmModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('confirmModal')) {
+                    document.getElementById('confirmModal').classList.remove('active');
+                }
+            });
+
+            document.getElementById('confirmYesBtn').addEventListener('click', () => {
+                files = [];
+                activities = [];
+                updateEmptyStates();
+                document.getElementById('confirmModal').classList.remove('active');
+                showToast('Todos los datos han sido limpiados', 'success');
+            });
+
+            document.getElementById('confirmNoBtn').addEventListener('click', () => {
+                document.getElementById('confirmModal').classList.remove('active');
+            });
+
+            // Settings
+            document.getElementById('closeSettingsModal').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.remove('active');
+            });
+
+            document.getElementById('settingsModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('settingsModal')) {
+                    document.getElementById('settingsModal').classList.remove('active');
+                }
+            });
+
+            document.getElementById('storageLimit').addEventListener('input', function() {
+                document.getElementById('storageLimitValue').textContent = `${this.value} GB`;
+            });
+
+            document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+                const username = document.getElementById('usernameInput').value;
+                document.getElementById('username').textContent = username;
+                document.getElementById('settingsModal').classList.remove('active');
+                showToast('Configuración guardada correctamente', 'success');
+            });
+
+            document.getElementById('cancelSettingsBtn').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.remove('active');
+            });
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('username').textContent = 'Invitado';
+                document.getElementById('usernameInput').value = 'Invitado';
+                showToast('Sesión cerrada', 'info');
+            });
+
+            // View options
+            document.getElementById('gridViewBtn').addEventListener('click', () => {
+                document.getElementById('gridViewBtn').classList.add('active');
+                document.getElementById('listViewBtn').classList.remove('active');
+                document.getElementById('filesContainer').classList.remove('list-view');
+            });
+
+            document.getElementById('listViewBtn').addEventListener('click', () => {
+                document.getElementById('listViewBtn').classList.add('active');
+                document.getElementById('gridViewBtn').classList.remove('active');
+                document.getElementById('filesContainer').classList.add('list-view');
+            });
+
+            // Search
+            const searchInput = document.getElementById('searchInput');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                clearSearchBtn.style.display = searchTerm ? 'block' : 'none';
+                
+                document.querySelectorAll('.file-card').forEach(card => {
+                    const fileName = card.querySelector('.file-name').textContent.toLowerCase();
+                    card.style.display = fileName.includes(searchTerm) ? 'block' : 'none';
+                });
+            });
+            
+            clearSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                this.style.display = 'none';
+                document.querySelectorAll('.file-card').forEach(card => {
+                    card.style.display = 'block';
+                });
+                searchInput.focus();
+            });
+
+            // Notifications
+            document.getElementById('notificationsBtn').addEventListener('click', () => {
+                document.getElementById('notificationCount').textContent = '0';
+                document.getElementById('notificationCount').style.display = 'none';
+                showToast('Notificaciones marcadas como leídas', 'success');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
